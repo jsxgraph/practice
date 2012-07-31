@@ -367,7 +367,7 @@ Assessor.Collinear = function (weak) {
 
         res = A && B && C;
 
-        if (!this.weak && (C.id === A.id || C.id === B.id || A.id === B.id)) {
+        if (!this.weak && res && (C.id === A.id || C.id === B.id || A.id === B.id)) {
             res = false;
         }
 

@@ -27,6 +27,7 @@
     <select id="problem"></select>
     <a href="javascript:void(0);" onclick="" id="check">Check</a>
 </div>
+<div id="task"></div>
 <div id="jxgbox" class="jxgbox" style="width:500px; height:500px; float: left"></div>
 <div id="log" style="height: 500px; overflow-y: scroll;"></div>
 <div id="debug" style="display:block;"></div>
@@ -70,7 +71,7 @@
                 $('#log').append('verifying problem "' + conf[$('#problem').val()].name + '".<br />');
                 ok = conf[$('#problem').val()].constraints.verify(GUI.board);
 
-                $('#log').append('Result: ' + ok + '<br />');
+                $('#log').append('<strong>Result: ' + (ok ? 'CORRECT' : 'WRONG') + '</strong><br />');
                 $('#log').append('Fixtures:<br />');
 
                 for (i in conf[$('#problem').val()].constraints.fixtures) {
@@ -83,12 +84,18 @@
 
             for (i in conf) {
                 $('#problem').append('<option value="' + i + '">' + conf[i].name + '</option>');
+                $('#task').html(conf[$('#problem').val()].task);
             }
+
+            $('#problem').on('change', function (e) {
+                $('#task').html(conf[$('#problem').val()].task);
+            });
         };
 
         var conf = {
                 collinear: {
                     name: "Collinear",
+                    task: "Place three collinear points.",
                     constraints: new Assessor.ConstraintCollection(
                        '{"class": "Collinear", "parameters": [false, "A", "B", "C"]}',
                         //new Assessor.Collinear('A', 'B', 'C'),
@@ -98,6 +105,7 @@
                 },
                 supplementary: {
                     name: 'Supplementary angles',
+                    task: 'Create an angle whos measure is 120 &deg; and its supplementary angle.',
                     constraints: new Assessor.ConstraintCollection(
                         '{"class": "Angle", "parameters": [120, "A", "B", "C"]}',
                         //new Assessor.Angle(120, 'A', 'B', 'C'),
@@ -107,6 +115,7 @@
                 },
                 linearpair: {
                     name: 'Linear pair',
+                    task: 'Create line pair with one angle measuring 120 &deg;.',
                     constraints: new Assessor.ConstraintCollection(
                        '{"class": "NumberElements", "parameters": ["angle", 2]}',
                        '{"class": "Angle", "parameters": [120, "C", "B", "A"]}',

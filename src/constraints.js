@@ -169,8 +169,6 @@ Assessor.ConstraintCollection = function () {
 };
 
 Assessor.Constraint = function (value) {
-    this.type = 'generic';
-
     this.value = value;
 
     this.flatCopy = function (o) {
@@ -196,7 +194,7 @@ Assessor.Constraint = function (value) {
     };
 
     this.toJSON = function () {
-        return '{"type": "generic",' +
+        return '{' +
                 '"class": "Constraint",' +
                 '"parameters": [' + this.value + ']' +
             '}';
@@ -204,7 +202,7 @@ Assessor.Constraint = function (value) {
 };
 
 // Verify the number of elements
-Assessor.NumberElements = function (what, number) {
+Assessor.NumberElements = function (what, minNumber, maxNumber) {
     this.constructor();
 
     var collect = function (board, constraints) {
@@ -215,7 +213,7 @@ Assessor.NumberElements = function (what, number) {
                     el = board.objects[e];
 
                     for (i in constraints) {
-                        if (constraints.hasOwnProperty(i) && el[i] === constraints[i] && el.visProp && !el.visProp.priv) {
+                        if (constraints.hasOwnProperty(i) && el[i] === constraints[i] && el.visProp && !el.visProp.priv && el.visProp.visible) {
                             number++;
                         }
                     }
@@ -226,10 +224,9 @@ Assessor.NumberElements = function (what, number) {
         };
 
 
-    this.type = '#elements';
-
     this.what = what;
-    this.number = number;
+    this.minNumber = minNumber;
+    this.maxNumber = maxNumber;
 
     this.verify = function (board, fixtures) {
         var number;
@@ -250,6 +247,11 @@ Assessor.NumberElements = function (what, number) {
                         elementClass: JXG.OBJECT_CLASS_CIRCLE
                     });
                 break;
+            case 'polygon':
+                number = collect(board, {
+                        type: JXG.OBJECT_TYPE_POLYGON
+                    });
+                break;
             case 'angle':
                 number = collect(board, {
                         type: JXG.OBJECT_TYPE_ANGLE
@@ -259,30 +261,25 @@ Assessor.NumberElements = function (what, number) {
                 number = 0;
         }
 
-        return number === this.number;
+        console.log('found ', number, this.what, 'expected', this.minNumber, 'to', this.maxNumber);
+
+        return number <= this.maxNumber && number >= this.minNumber;
     };
 
     this.toJSON = function () {
         return '{' +
-                '"type": "#elements",' +
-                '"what": "' + this.what + '",' +
-                '"number": ' + this.number + ', ' +
                 '"class": "NumberElements",' +
-                '"parameters": ["' + this.what + '", ' + this.number + ']' +
+                '"parameters": ["' + this.what + '", ' + this.minNumber + ', ' + this.maxNumber + ']' +
             '}';
     };
 };
 Assessor.NumberElements.prototype = new Assessor.Constraint;
 
 // Verify collinearity of a set of points
-Assessor.Collinear = function (weak) {
+Assessor.Collinear = function (A, B, C) {
     this.constructor();
 
-    this.type = 'collinear';
-
-    this.points = Array.prototype.slice.call(arguments, 1);
-
-    this.weak = weak;
+    this.points = [A, B, C];
 
     this.elements = function () {
         return this.points;
@@ -367,7 +364,7 @@ Assessor.Collinear = function (weak) {
 
         res = A && B && C;
 
-        if (!this.weak && res && (C.id === A.id || C.id === B.id || A.id === B.id)) {
+        if (res && (C.id === A.id || C.id === B.id || A.id === B.id)) {
             res = false;
         }
 
@@ -387,10 +384,8 @@ Assessor.Collinear = function (weak) {
 
     this.toJSON = function () {
         return '{' +
-                '"type": "collinear",' +
-                '"points": ["' + this.points.join('", "') + '"],' +
                 '"class": "Collinear",' +
-                '"parameters": [' + this.weak + ', "' + this.points.join('", "') + '"]' +
+                '"parameters": ["' + this.points.join('", "') + '"]' +
             '}';
     };
 };
@@ -406,13 +401,12 @@ Assessor.Collinear.prototype = new Assessor.Constraint;
 //     +-------------------+
 //     B                   A
 //
-Assessor.Angle = function (value) {
+Assessor.Angle = function (minValue, maxValue, A, B, C) {
     this.constructor();
 
-    this.type = 'angle';
-
-    this.points = Array.prototype.slice.call(arguments, 1);
-    this.value = value;
+    this.points = [A, B, C];
+    this.minValue = minValue;
+    this.maxValue = maxValue;
 
     this.elements = function () {
         return this.points;
@@ -466,7 +460,7 @@ console.log('fixtures are all set', fix, this.verify(board, fix));
     };
 
     this.verify = function (board, fixtures) {
-        var A, B, C, res;
+        var A, B, C, res, a;
 
         if (this.points.length < 3) {
             return false;
@@ -477,10 +471,14 @@ console.log('fixtures are all set', fix, this.verify(board, fix));
         C = fixtures[this.points[2]];
 
         //A && B && C && console.log('checking &lt;' + A.name + B.name + C.name + ' = ' + JXG.Math.Geometry.trueAngle(A, B, C));
-        res = A && B && C && A.id !== B.id && A.id !== C.id && B.id !== C.id && Math.abs(JXG.Math.Geometry.trueAngle(A, B, C) - this.value) <= 5;
+        res = A && B && C && A.id !== B.id && A.id !== C.id && B.id !== C.id;
 
         if (res) {
-            console.log('verified angle &lt;' + A.name + B.name + C.name + ' = ' + JXG.Math.Geometry.trueAngle(A, B, C) + ' / ' + this.value);
+            a = JXG.Math.Geometry.trueAngle(A, B, C);
+            res = this.minValue <= a && this.maxValue >= a;
+
+            if (res)
+                console.log('verified angle &lt;' + A.name + B.name + C.name + ' = ' + JXG.Math.Geometry.trueAngle(A, B, C) + ' / ' + this.value);
         }
 
         return res;
@@ -488,12 +486,109 @@ console.log('fixtures are all set', fix, this.verify(board, fix));
 
     this.toJSON = function () {
         return '{' +
-                '"type": "angle",' +
-                '"points": ["' + this.points.join('", "') + '"],' +
-                '"value": ' + this.value + ', ' +
                 '"class": "Angle",' +
-                '"parameters": [' + this.value + ', "' + this.points.join('", "') + '"]' +
+                '"parameters": [' + this.minValue + ', ' + this.maxValue + ', "' + this.points.join('", "') + '"]' +
             '}';
     };
 };
 Assessor.Angle.prototype = new Assessor.Constraint;
+
+Assessor.Angle3P = function () {
+    Assessor.Angle.apply(this, arguments);
+
+    this.choose = function (board, fixtures) {
+        var i, j, k, fix, new_fixtures = [];
+
+        for (i = 0; i < board.objectsList.length; i++) {
+            if (!JXG.isPoint(board.objectsList[i]) || !board.objectsList[i].visProp.visible) {
+                continue;
+            }
+
+            for (j = 0; j < board.objectsList.length; j++) {
+                if (!JXG.isPoint(board.objectsList[j]) || !board.objectsList[j].visProp.visible) {
+                    continue;
+                }
+
+                for (k = 0; k < board.objectsList.length; k++) {
+                    if (!JXG.isPoint(board.objectsList[k]) || !board.objectsList[k].visProp.visible) {
+                        continue;
+                    }
+
+                    fix = this.flatCopy(fixtures);
+                    if (!fix[this.points[0]]) {
+                        fix[this.points[0]] = board.objectsList[i];
+                    }
+
+                    if (!fix[this.points[1]]) {
+                        fix[this.points[1]] = board.objectsList[j];
+                    }
+
+                    if (!fix[this.points[2]]) {
+                        fix[this.points[2]] = board.objectsList[k];
+                    }
+
+                    if (this.verify(board, fix)) {
+                        new_fixtures.push(fix);
+                    }
+                }
+            }
+        }
+
+        return new_fixtures;
+    };
+
+    this.toJSON = function () {
+        return '{' +
+                '"class": "Angle3P",' +
+                '"parameters": [' + this.minValue + ', ' + this.maxValue + ', "' + this.points.join('", "') + '"]' +
+            '}';
+    };
+};
+Assessor.Angle3P.prototype = new Assessor.Angle;
+
+Assessor.Polygon = function (min, max, name) {
+    // +1 because the first point is stored twice in the vertices array of a polygon!
+    this.minVertices = min + 1;
+    this.maxVertices = max + 1;
+    this.name = name;
+
+    this.choose = function (board, fixtures) {
+        var i, fix, new_fixtures = [];
+
+        if (fixtures[this.name]) {
+            return new_fixtures;
+        }
+
+        for (i = 0; i < board.objectsList.length; i++) {
+            if (board.objectsList[i].type === JXG.OBJECT_TYPE_POLYGON) {
+                fix = this.flatCopy(fixtures);
+
+                console.log('polygon constraint, fixating', this.name, board.objectsList[i].name);
+                fix[this.name] = board.objectsList[i];
+                if (this.verify(board, fix)) {
+                    new_fixtures.push(fix);
+                }
+            }
+        }
+
+        return new_fixtures;
+    };
+
+    this.verify = function (board, fixtures) {
+        var res;
+
+        res = fixtures[this.name] && fixtures[this.name].type === JXG.OBJECT_TYPE_POLYGON &&
+              fixtures[this.name].vertices && fixtures[this.name].vertices.length >= this.minVertices &&
+              fixtures[this.name].vertices.length <= this.maxVertices;
+
+        return res;
+    };
+
+    this.toJSON = function () {
+        return '{' +
+                '"class": "Polygon",' +
+                '"parameters": [' + this.minVertices+ ', ' + this.maxVertices + ']' +
+            '}';
+    }
+};
+Assessor.Polygon.prototype = new Assessor.Constraint;

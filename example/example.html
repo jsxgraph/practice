@@ -97,34 +97,61 @@
                     name: "Collinear",
                     task: "Place three collinear points.",
                     constraints: new Assessor.ConstraintCollection(
-                       '{"class": "Collinear", "parameters": [false, "A", "B", "C"]}',
-                        //new Assessor.Collinear('A', 'B', 'C'),
-                        '{"class": "NumberElements", "parameters": ["point", 3]}'
-                        //new Assessor.NumberElements('point', 3)
+                        '{"class": "Collinear", "parameters": ["A", "B", "C"]}',
+                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}'
                     )
                 },
                 supplementary: {
                     name: 'Supplementary angles',
                     task: 'Create an angle whos measure is 120 &deg; and its supplementary angle.',
                     constraints: new Assessor.ConstraintCollection(
-                        '{"class": "Angle", "parameters": [120, "A", "B", "C"]}',
-                        //new Assessor.Angle(120, 'A', 'B', 'C'),
-                        '{"class": "Angle", "parameters": [60, "D", "E", "F"]}'
-                        //new Assessor.Angle(60, 'D', 'E', 'F')
+                        '{"class": "Angle", "parameters": [115, 125, "A", "B", "C"]}',
+                        '{"class": "Angle", "parameters": [55, 65, "D", "E", "F"]}'
                     )
                 },
                 linearpair: {
                     name: 'Linear pair',
                     task: 'Create line pair with one angle measuring 120 &deg;.',
                     constraints: new Assessor.ConstraintCollection(
-                       '{"class": "NumberElements", "parameters": ["angle", 2]}',
-                       '{"class": "Angle", "parameters": [120, "C", "B", "A"]}',
-                       '{"class": "Angle", "parameters": [60, "D", "B", "E"]}',
-                        new Assessor.Collinear(false, 'A', 'B', 'D'),
-                        new Assessor.Collinear(true, 'B', 'E', 'C')
+                        '{"class": "NumberElements", "parameters": ["angle", 2, 2]}',
+                        '{"class": "Angle", "parameters": [115, 125, "C", "B", "A"]}',
+                        '{"class": "Angle", "parameters": [55, 65, "D", "B", "E"]}',
+                        '{"class": "Collinear", "parameters": ["A", "B", "D"]}',
+                        '{"class": "Angle3P", "parameters": [115, 125, "E", "B", "A"]}',
+                        '{"class": "Angle3P", "parameters": [55, 65, "D", "B", "C"]}'
+                    )
+                },
+                acute: {
+                    name: 'Acute angle',
+                    task: 'Draw an acute angle',
+                    constraints: new Assessor.ConstraintCollection(
+                        '{"class": "NumberElements", "parameters": ["angle", 1, 1]}',
+                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}',
+                        '{"class": "Angle", "parameters": [0, 90, "A", "B", "C"]}'
+                    )
+                },
+                rightangle: {
+                    name: 'Right angle',
+                    task: 'Draw a right angle',
+                    constraints: new Assessor.ConstraintCollection(
+                        '{"class": "NumberElements", "parameters": ["angle", 1, 1]}',
+                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}',
+                        '{"class": "Angle", "parameters": [85, 95, "A", "B", "C"]}'
+                    )
+                },
+                righttriangle: {
+                    name: 'Right triangle',
+                    task: 'Draw a right triangle',
+                    constraints: new Assessor.ConstraintCollection(
+                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}',
+                        '{"class": "NumberElements", "parameters": ["polygon", 1, 1]}',
+                        '{"class": "Polygon", "parameters": [3, 3, "triangle"]}',
+                        '{"class": "Angle3P", "parameters": [85, 95, "A", "B", "C"]}'
                     )
                 }
             };
+
+        window.conf = conf;
     })();
 
     /* ]]> */

@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>ck12 ilo tests</title>
+    <title>practice examples</title>
     <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
     <script type="text/javascript" src="http://bin.sketchometry.com/js/jquery.js"></script>
     <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/~michael/jsxgui/JSXGraph/src/loadjsxgraph.js"></script>
@@ -18,7 +18,7 @@
 </head>
 <body>
 
-<h2>ilo tests</h2>
+<h2>A few practice examples</h2>
 
 <div id="ui" style="display:block;">
     <a href="javascript:void(0);" onclick="GUI.undo();">Undo</a>
@@ -36,6 +36,12 @@
     /* <![CDATA[ */
 
     (function () {
+
+        if (typeof console === 'undefined' || !console.log) {
+            console = {
+                log: function () {}
+            }
+        }
 
         window.onload = function () {
             var i;

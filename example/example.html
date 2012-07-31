@@ -1,0 +1,124 @@
+<html>
+<head>
+    <title>ck12 ilo tests</title>
+    <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
+    <script type="text/javascript" src="http://bin.sketchometry.com/js/jquery.js"></script>
+    <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/~michael/jsxgui/JSXGraph/src/loadjsxgraph.js"></script>
+    <script type="text/javascript" src="http://bin.sketchometry.com/js/dollarn.js"></script>
+    <script type="text/javascript" src="http://bin.sketchometry.com/js/sketch.js"></script>
+
+    <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="constraints.js"></script>
+
+    <style type="text/css">
+        #debug {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>ilo tests</h2>
+
+<div id="ui" style="display:block;">
+    <a href="javascript:void(0);" onclick="GUI.undo();">Undo</a>
+    <a href="javascript:void(0);" onclick="GUI.redo();">Redo</a>
+    <a href="javascript:void(0);" onclick="" id="measure">Measure</a>
+    <select id="problem"></select>
+    <a href="javascript:void(0);" onclick="" id="check">Check</a>
+</div>
+<div id="jxgbox" class="jxgbox" style="width:500px; height:500px; float: left"></div>
+<div id="log" style="height: 500px; overflow-y: scroll;"></div>
+<div id="debug" style="display:block;"></div>
+
+<script type="text/javascript">
+    /* <![CDATA[ */
+
+    (function () {
+
+        window.onload = function () {
+            var i;
+            Assessor.init();
+
+            /*a = GUI.board.create('point', [-5, 0]);
+            b = GUI.board.create('point', [-3, 0]);
+            c = GUI.board.create('point', [-1.5, 2.2]);
+            d = GUI.board.create('point', [1, 0]);
+            e = GUI.board.create('point', [-0.3, 4.1]);
+
+            GUI.board.create('angle', [c, b, a]);
+            GUI.board.create('angle', [d, b, e]);*/
+
+            $('#measure').on('click', function (e) {
+                var points = window.prompt('Input points you want to measure e.g. "AB" to measure distance AB or "ABC" to measure angle ABC (counterclockwise)', 'ABC'),
+                    pts = points.split(''),
+                    i, a;
+
+                if (pts.length === 3) {
+                    a = GUI.board.create('angle', pts);
+                    a.label.content.setText(function () {
+                        return JXG.autoDigits(a.Value()/Math.PI*180);
+                    });
+                }
+            });
+
+            $('#check').on('click', function (e_) {
+                var i, ok = true;
+
+                $('#log').html('');
+                conf[$('#problem').val()].constraints.clearLog();
+                $('#log').append('verifying problem "' + conf[$('#problem').val()].name + '".<br />');
+                ok = conf[$('#problem').val()].constraints.verify(GUI.board);
+
+                $('#log').append('Result: ' + ok + '<br />');
+                $('#log').append('Fixtures:<br />');
+
+                for (i in conf[$('#problem').val()].constraints.fixtures) {
+                    $('#log').append(i + ' -> ' + conf[$('#problem').val()].constraints.fixtures[i].name + '<br />');
+                }
+
+                $('#log').append('---<br/>');
+                $('#log').append(conf[$('#problem').val()].constraints.logs.join('<br />'));
+            });
+
+            for (i in conf) {
+                $('#problem').append('<option value="' + i + '">' + conf[i].name + '</option>');
+            }
+        };
+
+        var conf = {
+                collinear: {
+                    name: "Collinear",
+                    constraints: new Assessor.ConstraintCollection(
+                       '{"class": "Collinear", "parameters": [false, "A", "B", "C"]}',
+                        //new Assessor.Collinear('A', 'B', 'C'),
+                        '{"class": "NumberElements", "parameters": ["point", 3]}'
+                        //new Assessor.NumberElements('point', 3)
+                    )
+                },
+                supplementary: {
+                    name: 'Supplementary angles',
+                    constraints: new Assessor.ConstraintCollection(
+                        '{"class": "Angle", "parameters": [120, "A", "B", "C"]}',
+                        //new Assessor.Angle(120, 'A', 'B', 'C'),
+                        '{"class": "Angle", "parameters": [60, "D", "E", "F"]}'
+                        //new Assessor.Angle(60, 'D', 'E', 'F')
+                    )
+                },
+                linearpair: {
+                    name: 'Linear pair',
+                    constraints: new Assessor.ConstraintCollection(
+                       '{"class": "NumberElements", "parameters": ["angle", 2]}',
+                       '{"class": "Angle", "parameters": [120, "C", "B", "A"]}',
+                       '{"class": "Angle", "parameters": [60, "D", "B", "E"]}',
+                        new Assessor.Collinear(false, 'A', 'B', 'D'),
+                        new Assessor.Collinear(true, 'B', 'E', 'C')
+                    )
+                }
+            };
+    })();
+
+    /* ]]> */
+</script>
+</body>
+</html>

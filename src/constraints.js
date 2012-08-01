@@ -302,7 +302,7 @@ Assessor.Collinear = function (A, B, C) {
             return [];
         } else {
             for (i = 0; i < board.objectsList.length; i++) {
-                if (!JXG.isPoint(board.objectsList[i])) {
+                if (!JXG.isPoint(board.objectsList[i]) || !board.objectsList[i].visProp.visible) {
                     continue;
                 }
 
@@ -315,7 +315,7 @@ Assessor.Collinear = function (A, B, C) {
                     }
                 } else {
                     for (j = i + 1; j < board.objectsList.length; j++) {
-                        if (!JXG.isPoint(board.objectsList[j])) {
+                        if (!JXG.isPoint(board.objectsList[j]) || !board.objectsList[j].visProp.visible) {
                             continue;
                         }
 
@@ -329,7 +329,7 @@ Assessor.Collinear = function (A, B, C) {
                             }
                         } else {
                             for (k = j + 1; k < board.objectsList.length; k++) {
-                                if (!JXG.isPoint(board.objectsList[k])) {
+                                if (!JXG.isPoint(board.objectsList[k]) || !board.objectsList[k].visProp.visible) {
                                     continue;
                                 }
 

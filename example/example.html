@@ -8,7 +8,9 @@
     <script type="text/javascript" src="http://bin.sketchometry.com/js/sketch.js"></script>
 
     <script type="text/javascript" src="../src/common.js"></script>
-    <script type="text/javascript" src="../src/constraints.js"></script>
+    <script type="text/javascript" src="../src/assessor.js"></script>
+    <script type="text/javascript" src="../src/verifier.js"></script>
+    <script type="text/javascript" src="../src/value.js"></script>
 
     <style type="text/css">
         #debug {
@@ -99,52 +101,79 @@
         };
 
         var conf = {
-                collinear: {
-                    name: "Collinear",
-                    task: "Place three collinear points.",
-                    constraints: new Assessor.ConstraintCollection(
-                        '{"class": "Collinear", "parameters": ["A", "B", "C"]}',
-                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}'
+            collinear: {
+                name: "Collinear",
+                task: "Place three collinear points.",
+                constraints: new Assessor.Assessment(
+                    new Assessor.Collinear('A', 'B', 'C'),
+                    new Assessor.Between(
+                        new Assessor.NumberElements('points'), 3, 3
                     )
-                },
+                )},
                 supplementary: {
                     name: 'Supplementary angles',
-                    task: 'Create an angle whos measure is 120 &deg; and its supplementary angle.',
-                    constraints: new Assessor.ConstraintCollection(
-                        '{"class": "Angle", "parameters": [115, 125, "A", "B", "C"]}',
-                        '{"class": "Angle", "parameters": [55, 65, "D", "E", "F"]}'
+                    task: 'Create an angle with a measure of 120 &deg; and its supplementary angle.',
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Between(
+                            new Assessor.Angle('alpha', 'A', 'B', 'C'), 115, 125
+                        ),
+                        new Assessor.Between(
+                            new Assessor.Angle('beta', 'D', 'E', 'F'), 55, 65
+                        )
                     )
                 },
                 linearpair: {
                     name: 'Linear pair',
                     task: 'Create line pair with one angle measuring 120 &deg;.',
-                    constraints: new Assessor.ConstraintCollection(
-                        '{"class": "NumberElements", "parameters": ["angle", 2, 2]}',
-                        '{"class": "Angle", "parameters": [115, 125, "C", "B", "A"]}',
-                        '{"class": "Angle", "parameters": [55, 65, "D", "B", "E"]}',
-                        '{"class": "Collinear", "parameters": ["A", "B", "D"]}',
-                        '{"class": "Angle3P", "parameters": [115, 125, "E", "B", "A"]}',
-                        '{"class": "Angle3P", "parameters": [55, 65, "D", "B", "C"]}'
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Between(
+                            new Assessor.NumberElements('angles'), 2, 2
+                        ),
+                        new Assessor.Between(
+                            new Assessor.Angle('alpha', 'C', 'B', 'A'), 115, 125
+                        ),
+                        new Assessor.Between(
+                            new Assessor.Angle('beta', 'D', 'B', 'E'), 55, 65
+                        ),
+                        new Assessor.Collinear('A', 'B', 'D'),
+                        new Assessor.Between(
+                            new Assessor.Angle3P('E', 'B', 'A'), 115, 125
+                        ),
+                        new Assessor.Between(
+                            new Assessor.Angle3P('D', 'B', 'C'), 55, 65
+                        )
                     )
                 },
                 acute: {
                     name: 'Acute angle',
                     task: 'Draw an acute angle',
-                    constraints: new Assessor.ConstraintCollection(
-                        '{"class": "NumberElements", "parameters": ["angle", 1, 1]}',
-                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}',
-                        '{"class": "Angle", "parameters": [0, 90, "A", "B", "C"]}'
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Between(
+                            new Assessor.NumberElements('angles'), 1, 1
+                        ),
+                        new Assessor.Between(
+                            new Assessor.NumberElements('points'), 3, 3
+                        ),
+                        new Assessor.Between(
+                            new Assessor.Angle('alpha', 'A', 'B', 'C'), 0, 90
+                        )
                     )
                 },
                 rightangle: {
                     name: 'Right angle',
                     task: 'Draw a right angle',
-                    constraints: new Assessor.ConstraintCollection(
-                        '{"class": "NumberElements", "parameters": ["angle", 1, 1]}',
-                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}',
-                        '{"class": "Angle", "parameters": [85, 95, "A", "B", "C"]}'
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Between(
+                            new Assessor.NumberElements('angles'), 1, 1
+                        ),
+                        new Assessor.Between(
+                            new Assessor.NumberElements('points'), 3, 3
+                        ),
+                        new Assessor.Between(
+                            new Assessor.Angle('alpha', 'A', 'B', 'C'), 85, 95
+                        )
                     )
-                },
+                }/*,
                 righttriangle: {
                     name: 'Right triangle',
                     task: 'Draw a right triangle',
@@ -154,7 +183,7 @@
                         '{"class": "Polygon", "parameters": [3, 3, "triangle"]}',
                         '{"class": "Angle3P", "parameters": [85, 95, "A", "B", "C"]}'
                     )
-                }
+                }*/
             };
 
         window.conf = conf;

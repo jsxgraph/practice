@@ -16,6 +16,23 @@ JXG.extend(Assessor.Value.prototype, {
 });
 
 
+Assessor.Number = function (value) {
+    this.class = 'Number';
+    this.value = value;
+};
+Assessor.Number.prototype = new Assessor.Value;
+
+JXG.extend(Assessor.Number.prototype, {
+    evaluate: function (elements, fixtures) {
+        return this.value;
+    },
+
+    toJSON: function () {
+        return this.value.toString();
+    }
+});
+
+
 Assessor.NumberElements = function (what) {
     this.class = 'NumberElements';
     this.what = what;
@@ -35,6 +52,7 @@ JXG.extend(Assessor.NumberElements.prototype, {
 
 
 Assessor.Angle = function (name, A, B, C) {
+    this.class = 'Angle';
     this.name = name;
     this.points = [A, B, C];
 };
@@ -115,7 +133,7 @@ JXG.extend(Assessor.Angle.prototype, {
 
 
 Assessor.Angle3P = function (A, B, C) {
-    this.class = "Angle3P";
+    this.class = 'Angle3P';
     this.points = [A, B, C];
 };
 Assessor.Angle3P.prototype = new Assessor.Angle;
@@ -142,6 +160,64 @@ JXG.extend(Assessor.Angle3P.prototype, {
 
                     new_fixtures.push(fix);
                 }
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.points.join('", "') + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+
+Assessor.Distance = function (A, B) {
+    this.class = 'Distance';
+    this.points = [A, B];
+};
+Assessor.Distance.prototype = new Assessor.Value;
+
+JXG.extend(Assessor.Distance.prototype, {
+    evaluate: function (elements, fixtures) {
+        var A, B, res;
+
+        if (this.points.length !== 2) {
+            return NaN;
+        }
+
+        A = fixtures[this.points[0]];
+        B = fixtures[this.points[1]];
+
+        res = A && B && A.id !== B.id;
+
+        if (res) {
+            res = A.Dist(B);
+
+            this.log('|' + A.name + B.name + '| = ' + res);
+        } else {
+            res = NaN;
+        }
+
+        return res;
+    },
+
+    choose: function (elements, fixtures) {
+        var i, j, fix, new_fixtures = [];
+
+        for (i = 0; i < elements.points.length; i++) {
+            for (j = i + 1; j < elements.points.length; j++) {
+                fix = this.flatCopy(fixtures);
+                if (!fix[this.points[0]]) {
+                    fix[this.points[0]] = elements.points[i];
+                }
+
+                if (!fix[this.points[1]]) {
+                    fix[this.points[1]] = elements.points[j];
+                }
+
+                new_fixtures.push(fix);
             }
         }
 

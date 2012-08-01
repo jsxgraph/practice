@@ -35,7 +35,7 @@ JXG.extend(Assessor.Collinear.prototype, {
                     }
                 } else {
                     this.log('point 2 not fixed yet');
-                    for (j = i + 1; j < elements.points.length; j++) {
+                    for (j = 0; j < elements.points.length; j++) {
                         if (fixtures[this.points[2]]) {
                             this.log('point3 fixed');
                             fix = this.flatCopy(fixtures);
@@ -47,7 +47,7 @@ JXG.extend(Assessor.Collinear.prototype, {
                             }
                         } else {
                             this.log('point 3 not fixed');
-                            for (k = j + 1; k < elements.points.length; k++) {
+                            for (k = 0; k < elements.points.length; k++) {
                                 fix = this.flatCopy(fixtures);
                                 fix[this.points[0]] = elements.points[i];
                                 fix[this.points[1]] = elements.points[j];
@@ -107,20 +107,34 @@ JXG.extend(Assessor.Collinear.prototype, {
 
 Assessor.Between = function (value, min, max) {
     this.class = 'Between';
-    this.value = value;
-    this.min = min;
-    this.max = max;
+    this.value = this.expandNumber(value);
+    this.min = this.expandNumber(min);
+    this.max = this.expandNumber(max);
 };
 Assessor.Between.prototype = new Assessor.Verifier;
 
 JXG.extend(Assessor.Between.prototype, {
     choose: function (elements, fixtures) {
-        var poss = this.value.choose(elements, fixtures),
-            i, new_fixtures = [];
+        var vposs = this.value.choose(elements, fixtures),
+            miposs, maposs, i, j, k, new_fixtures = [];
 
-        for (i = 0; i < poss.length; i++) {
-            if (this.verify(elements, poss[i])) {
-                new_fixtures.push(poss[i]);
+        for (i = 0; i < vposs.length; i++) {
+            miposs = this.min.choose(elements, vposs[i]);
+            if (miposs.length === 0) {
+                miposs = [vposs[i]];
+            }
+
+            for (j = 0; j < miposs.length; j++) {
+                maposs = this.max.choose(elements, miposs[j]);
+                if(maposs.length === 0) {
+                    maposs = [miposs[j]];
+                }
+
+                for (k = 0; k < maposs.length; k++) {
+                    if (this.verify(elements, maposs[k])) {
+                        new_fixtures.push(maposs[k]);
+                    }
+                }
             }
         }
 
@@ -128,12 +142,60 @@ JXG.extend(Assessor.Between.prototype, {
     },
 
     verify: function (elements, fixtures) {
-        var v = this.value.evaluate(elements, fixtures);
-        return this.min <= v && v <= this.max;
+        var v = this.value.evaluate(elements, fixtures),
+            min = this.min.evaluate(elements, fixtures),
+            max = this.max.evaluate(elements, fixtures);
+
+        return min <= v && v <= max;
     },
 
     toJSON: function () {
         this.parameters = '[' + this.value.toJSON() + ', ' + this.min + ', ' + this.max + ']';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+
+Assessor.Equals = function (lhs, rhs, eps) {
+    this.class = 'Equals';
+    this.lhs = this.expandNumber(lhs);
+    this.rhs = this.expandNumber(rhs);
+
+    this.eps = eps || 1e-5;
+};
+Assessor.Equals.prototype = new Assessor.Verifier;
+
+JXG.extend(Assessor.Equals.prototype, {
+    choose: function (elements, fixtures) {
+        var lposs = this.lhs.choose(elements, fixtures),
+            rposs, new_fixtures = [], i, j;
+
+        for (i = 0; i < lposs.length; i++) {
+            rposs = this.rhs.choose(elements, lposs[i]);
+
+            if (rposs.length === 0 && this.verify(elements, lposs[i])) {
+                new_fixtures.push(lposs[i]);
+            } else {
+                for (j = 0; j < rposs.length; j++) {
+                    if (this.verify(elements, rposs[j])) {
+                        new_fixtures.push(rposs[j]);
+                    }
+                }
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    verify: function (elements, fixtures) {
+        var lhs = this.lhs.evaluate(elements, fixtures),
+            rhs = this.rhs.evaluate(elements, fixtures);
+
+        return Math.abs(lhs - rhs) <= this.eps;
+    },
+
+    toJSON: function () {
+        this.parameters = '[' + this.lhs.toJSON() + ', ' + this.rhs.toJSON() + ']';
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });

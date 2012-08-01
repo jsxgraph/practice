@@ -58,42 +58,49 @@ JXG.extend(Assessor.Base.prototype, {
         return r;
     },
 
-    expand: function (a) {
-        var i, c, co, newc = [],
-            thor = function (Constructor, params) {
-                // borrowed from http://stackoverflow.com/questions/3362471/how-can-i-call-a-javascript-constructor-using-call-or-apply
+    funstructor: function (Constructor, params) {
+        // borrowed from http://stackoverflow.com/questions/3362471/how-can-i-call-a-javascript-constructor-using-call-or-apply
 
-                return function () {
-                    var Temp = function () {}, inst, ret;
+        return function () {
+            var Temp = function () {}, inst, ret;
 
-                    // Give the Temp constructor the Constructor's prototype
-                    Temp.prototype = Constructor.prototype;
+            // Give the Temp constructor the Constructor's prototype
+            Temp.prototype = Constructor.prototype;
 
-                    // Create a new instance
-                    inst = new Temp;
+            // Create a new instance
+            inst = new Temp;
 
-                    // Call the original Constructor with the temp
-                    // instance as its context (i.e. its 'this' value)
-                    ret = Constructor.apply(inst, params);
+            // Call the original Constructor with the temp
+            // instance as its context (i.e. its 'this' value)
+            ret = Constructor.apply(inst, params);
 
-                    // If an object has been returned then return it otherwise
-                    // return the original instance.
-                    // (consistent with behaviour of the new operator)
-                    return Object(ret) === ret ? ret : inst;
-                };
-            };
+            // If an object has been returned then return it otherwise
+            // return the original instance.
+            // (consistent with behaviour of the new operator)
+            return Object(ret) === ret ? ret : inst;
+        };
+    },
 
+    expand: function (classname, parameters) {
+        var co;
+
+        try {
+            co = new (this.funstructor(classname, parameters))();
+        } catch (e) {
+            // meh, ignore it
+            this.log(e, e.stack);
+        }
+
+        return co;
+    },
+
+    expandJSON: function (a) {
+        var i, c, co, newc = [];
 
         for (i = 0; i < a.length; i++) {
             if (typeof a[i] === 'string' || !a[i].expanded) {
-                try {
-                    c = JSON.parse(a[i]);
-                    co = new (thor(Assessor[c.class], c.parameters))();
-                    newc.push(co);
-                } catch (e) {
-                    // meh, ignore it
-                    this.log(e, e.stack);
-                }
+                c = JSON.parse(a[i]);
+                co = this.expand(Assessor[c.class], c.parameters);
             } else {
                 newc.push(a[i]);
             }
@@ -119,6 +126,16 @@ JXG.extend(Assessor.Verifier.prototype, {
 
     verify: function (elements, fixtures) {
         return false;
+    },
+
+    expandNumber: function(v) {
+        var o = v;
+
+        if (!v.expanded) {
+            o = this.expand(Assessor.Number, [v]);
+        }
+
+        return o;
     }
 });
 
@@ -128,7 +145,7 @@ JXG.extend(Assessor.Verifier.prototype, {
  */
 Assessor.Assessment = function () {
     this.class = "Assessment";
-    this.constraints = this.expand(arguments);
+    this.constraints = this.expandJSON(arguments);
     this.fixtures = {};
 };
 Assessor.Assessment.prototype = new Assessor.Verifier;

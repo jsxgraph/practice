@@ -106,8 +106,8 @@
                 task: "Place three collinear points.",
                 constraints: new Assessor.Assessment(
                     new Assessor.Collinear('A', 'B', 'C'),
-                    new Assessor.Between(
-                        new Assessor.NumberElements('points'), 3, 3
+                    new Assessor.Equals(
+                        new Assessor.NumberElements('points'), 3
                     )
                 )},
                 supplementary: {
@@ -126,8 +126,8 @@
                     name: 'Linear pair',
                     task: 'Create line pair with one angle measuring 120 &deg;.',
                     constraints: new Assessor.Assessment(
-                        new Assessor.Between(
-                            new Assessor.NumberElements('angles'), 2, 2
+                        new Assessor.Equals(
+                            new Assessor.NumberElements('angles'), 2
                         ),
                         new Assessor.Between(
                             new Assessor.Angle('alpha', 'C', 'B', 'A'), 115, 125
@@ -148,11 +148,11 @@
                     name: 'Acute angle',
                     task: 'Draw an acute angle',
                     constraints: new Assessor.Assessment(
-                        new Assessor.Between(
-                            new Assessor.NumberElements('angles'), 1, 1
+                        new Assessor.Equals(
+                            new Assessor.NumberElements('angles'), 1
                         ),
-                        new Assessor.Between(
-                            new Assessor.NumberElements('points'), 3, 3
+                        new Assessor.Equals(
+                            new Assessor.NumberElements('points'), 3
                         ),
                         new Assessor.Between(
                             new Assessor.Angle('alpha', 'A', 'B', 'C'), 0, 90
@@ -163,14 +163,29 @@
                     name: 'Right angle',
                     task: 'Draw a right angle',
                     constraints: new Assessor.Assessment(
-                        new Assessor.Between(
-                            new Assessor.NumberElements('angles'), 1, 1
+                        new Assessor.Equals(
+                            new Assessor.NumberElements('angles'), 1
                         ),
-                        new Assessor.Between(
-                            new Assessor.NumberElements('points'), 3, 3
+                        new Assessor.Equals(
+                            new Assessor.NumberElements('points'), 3
                         ),
                         new Assessor.Between(
                             new Assessor.Angle('alpha', 'A', 'B', 'C'), 85, 95
+                        )
+                    )
+                },
+                bisector: {
+                    name: 'Bisector point',
+                    task: 'Place three points such that one of them bisects the segment between the other two.',
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Equals(
+                            new Assessor.NumberElements('points'), 3
+                        ),
+                        new Assessor.Collinear('A', 'B', 'C'),
+                        new Assessor.Equals(
+                            new Assessor.Distance('A', 'B'),
+                            new Assessor.Distance('B', 'C'),
+                            0.5
                         )
                     )
                 }/*,

@@ -214,21 +214,18 @@ JXG.extend(Assessor.Line.prototype, {
 
         for (i = 0; i < elements.lines.length; i++) {
             fix = this.flatCopy(fixtures);
-            push = false;
 
             if (!fix[this.line]) {
                 fix[this.line] = elements.lines[i];
-                push = true;
             }
 
             for (j = 0; j < 2; j++) {
                 if (!fix[this.points[j]]) {
                     fix[this.points[j]] = elements.lines[i]['point' + (j+1)];
-                    push = true;
                 }
             }
 
-            if (push && JXG.indexOf(elements.points, elements.lines[i].point1) > -1 && JXG.indexOf(elements.points, elements.lines[i].point2) > -1 ) {
+            if (this.verify(elements, fix)) {
                 new_fixtures.push(fix);
             }
         }
@@ -238,12 +235,83 @@ JXG.extend(Assessor.Line.prototype, {
 
     verify: function (elements, fixtures) {
         return fixtures[this.line]
+            && JXG.indexOf(elements.points, fixtures[this.line].point1) > -1 && JXG.indexOf(elements.points, fixtures[this.line].point2) > -1
             && ((fixtures[this.line].point1 === fixtures[this.points[0]] && fixtures[this.line].point2 === fixtures[this.points[1]])
             || (fixtures[this.line].point1 === fixtures[this.points[1]] && fixtures[this.line].point2 === fixtures[this.points[0]]));
     },
 
     toJSON: function () {
         this.parameters = '["' + this.line + '", "' + this.points.join('", "') + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+
+Assessor.Angle = function (name, A, B, C) {
+    this.class = 'Angle';
+    this.name = name;
+    this.points = [A, B, C];
+};
+Assessor.Angle.prototype = new Assessor.Verifier;
+
+JXG.extend(Assessor.Angle.prototype, {
+    choose: function (elements, fixtures) {
+        var i, a, fix, new_fixtures = [];
+
+        // find all valid combinations depending on previous fixtures
+        for (i = 0; i < elements.angles.length; i++) {
+            a = elements.angles[i];
+
+            this.log('checking out angle', a.name, 'with value', a.Value()*180/Math.PI);
+
+            fix = this.flatCopy(fixtures);
+
+            fix[this.name] = fix[this.name] || a;
+            fix[this.points[0]] = fix[this.points[0]] || JXG.getRef(a.board, a.parents[0]);
+            fix[this.points[1]] = fix[this.points[1]] || JXG.getRef(a.board, a.parents[1]);
+            fix[this.points[2]] = fix[this.points[2]] || JXG.getRef(a.board, a.parents[2]);
+
+            if (this.verify(elements, fix)) {
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    verify: function (elements, fixtures) {
+        var a = fixtures[this.name];
+
+        if (!a) {
+            return false;
+        }
+        // check if the dependencies and the fixtures work out
+        fixtures[this.points[0]] = fixtures[this.points[0]] || JXG.getRef(a.board, a.parents[0]);
+        if (fixtures[this.points[0]].id !== a.parents[0]) {
+            this.log('point 1 is wrong');
+            // nah, point1 is already set but doesn't match with what it is set to
+            return false;
+        }
+
+        fixtures[this.points[1]] = fixtures[this.points[1]] || JXG.getRef(a.board, a.parents[1]);
+        if (fixtures[this.points[1]].id !== a.parents[1]) {
+            this.log('point 2 is wrong');
+            // nah, point1 is already set but doesn't match with what it is set to
+            return false;
+        }
+
+        fixtures[this.points[2]] = fixtures[this.points[2]] || JXG.getRef(a.board, a.parents[2]);
+        if (fixtures[this.points[2]].id !== a.parents[2]) {
+            this.log('point 3 is wrong');
+            // nah, point1 is already set but doesn't match with what it is set to
+            return false;
+        }
+
+        return true;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.name + '", "' + this.points.join('", "') + '"]';
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });

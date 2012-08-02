@@ -109,10 +109,10 @@
                         new Assessor.NumberElements('points'), 1
                     ),
                     new Assessor.Between(
-                        new Assessor.XY('A', 'X'), 1.7, 2.3
+                        new Assessor.XY('A', 'X'), 1.9, 2.1
                     ),
                     new Assessor.Between(
-                        new Assessor.XY('A', 'Y'), 2.7, 3.3
+                        new Assessor.XY('A', 'Y'), 2.9, 3.1
                     )
                 )
             },
@@ -142,11 +142,13 @@
                     name: 'Supplementary angles',
                     task: 'Create an angle with a measure of 120 &deg; and its supplementary angle.',
                     constraints: new Assessor.Assessment(
+                        new Assessor.Angle('alpha', 'A', 'B', 'C'),
+                        new Assessor.Angle('beta', 'D', 'E', 'F'),
                         new Assessor.Between(
-                            new Assessor.Angle('alpha', 'A', 'B', 'C'), 115, 125
+                            new Assessor.MAngle('alpha'), 115, 125
                         ),
                         new Assessor.Between(
-                            new Assessor.Angle('beta', 'D', 'E', 'F'), 55, 65
+                            new Assessor.MAngle('beta'), 55, 65
                         )
                     )
                 },
@@ -157,11 +159,13 @@
                         new Assessor.Equals(
                             new Assessor.NumberElements('angles'), 2
                         ),
+                        new Assessor.Angle('alpha', 'C', 'B', 'A'),
                         new Assessor.Between(
-                            new Assessor.Angle('alpha', 'C', 'B', 'A'), 115, 125
+                            new Assessor.MAngle('alpha'), 115, 125
                         ),
+                        new Assessor.Angle('beta', 'D', 'B', 'E'),
                         new Assessor.Between(
-                            new Assessor.Angle('beta', 'D', 'B', 'E'), 55, 65
+                            new Assessor.MAngle('beta'), 55, 65
                         ),
                         new Assessor.Collinear('A', 'B', 'D'),
                         new Assessor.Between(
@@ -182,8 +186,9 @@
                         new Assessor.Equals(
                             new Assessor.NumberElements('points'), 3
                         ),
+                        new Assessor.Angle('alpha', 'A', 'B', 'C'),
                         new Assessor.Between(
-                            new Assessor.Angle('alpha', 'A', 'B', 'C'), 0, 90
+                            new Assessor.MAngle('alpha'), 0, 90
                         )
                     )
                 },
@@ -197,8 +202,9 @@
                         new Assessor.Equals(
                             new Assessor.NumberElements('points'), 3
                         ),
+                        new Assessor.Angle('alpha', 'A', 'B', 'C'),
                         new Assessor.Between(
-                            new Assessor.Angle('alpha', 'A', 'B', 'C'), 85, 95
+                            new Assessor.MAngle('alpha'), 85, 95
                         )
                     )
                 },

@@ -116,6 +116,19 @@
                     )
                 )
             },
+            line: {
+                name: 'Line',
+                task: 'Draw two points and put a line through them',
+                constraints: new Assessor.Assessment(
+                    new Assessor.Equals(
+                        new Assessor.NumberElements('points'), 2
+                    ),
+                    new Assessor.Equals(
+                        new Assessor.NumberElements('lines'), 1
+                    ),
+                    new Assessor.Line('l', 'P', 'Q')
+                )
+            },
             collinear: {
                 name: "Collinear",
                 task: "Place three collinear points.",

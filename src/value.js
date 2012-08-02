@@ -232,6 +232,7 @@ JXG.extend(Assessor.Distance.prototype, {
 
 
 Assessor.XY = function (A, what) {
+    this.class = 'XY';
     this.point = A;
     this.what = what.toLowerCase() === 'y' ? 'Y' : 'X';
 };
@@ -263,6 +264,7 @@ JXG.extend(Assessor.XY.prototype, {
 });
 
 Assessor.SlopeY = function (l, what) {
+    this.class = 'SlopeY';
     this.line = l;
     this.what = what.toLowerCase() === 'slope' ? 'getSlope' : 'getRise';
 };

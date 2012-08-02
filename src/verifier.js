@@ -199,3 +199,51 @@ JXG.extend(Assessor.Equals.prototype, {
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
+
+
+Assessor.Line = function (l, A, B) {
+    this.class = 'Line';
+    this.line = l;
+    this.points = [A, B];
+};
+Assessor.Line.prototype = new Assessor.Verifier;
+
+JXG.extend(Assessor.Line.prototype, {
+    choose: function (elements, fixtures) {
+        var new_fixtures = [], fix, i, j, push = false;
+
+        for (i = 0; i < elements.lines.length; i++) {
+            fix = this.flatCopy(fixtures);
+            push = false;
+
+            if (!fix[this.line]) {
+                fix[this.line] = elements.lines[i];
+                push = true;
+            }
+
+            for (j = 0; j < 2; j++) {
+                if (!fix[this.points[j]]) {
+                    fix[this.points[j]] = elements.lines[i]['point' + (j+1)];
+                    push = true;
+                }
+            }
+
+            if (push && JXG.indexOf(elements.points, elements.lines[i].point1) > -1 && JXG.indexOf(elements.points, elements.lines[i].point2) > -1 ) {
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    verify: function (elements, fixtures) {
+        return fixtures[this.line]
+            && ((fixtures[this.line].point1 === fixtures[this.points[0]] && fixtures[this.line].point2 === fixtures[this.points[1]])
+            || (fixtures[this.line].point1 === fixtures[this.points[1]] && fixtures[this.line].point2 === fixtures[this.points[0]]));
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.line + '", "' + this.points.join('", "') + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});

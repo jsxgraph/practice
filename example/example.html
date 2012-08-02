@@ -101,6 +101,21 @@
         };
 
         var conf = {
+            point: {
+                name: 'Point',
+                task: 'Place a point at (2, 3)',
+                constraints: new Assessor.Assessment(
+                    new Assessor.Equals(
+                        new Assessor.NumberElements('points'), 1
+                    ),
+                    new Assessor.Between(
+                        new Assessor.XY('A', 'X'), 1.7, 2.3
+                    ),
+                    new Assessor.Between(
+                        new Assessor.XY('A', 'Y'), 2.7, 3.3
+                    )
+                )
+            },
             collinear: {
                 name: "Collinear",
                 task: "Place three collinear points.",

@@ -229,3 +229,66 @@ JXG.extend(Assessor.Distance.prototype, {
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
+
+
+Assessor.XY = function (A, what) {
+    this.point = A;
+    this.what = what.toLowerCase() === 'y' ? 'Y' : 'X';
+};
+Assessor.XY.prototype = new Assessor.Value;
+
+JXG.extend(Assessor.XY.prototype, {
+    evaluate: function (elements, fixtures) {
+        return fixtures[this.point] ? fixtures[this.point][this.what]() : NaN;
+    },
+
+    choose: function (elements, fixtures) {
+        var new_fixtures = [], fix, i;
+
+        if (!fixtures[this.point]) {
+            for (i = 0; i < elements.points.length; i++) {
+                fix = this.flatCopy(fixtures);
+                fix[this.point] = elements.points[i];
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.point + '", "' + this.what + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+Assessor.SlopeY = function (l, what) {
+    this.line = l;
+    this.what = what.toLowerCase() === 'slope' ? 'getSlope' : 'getRise';
+};
+Assessor.SlopeY.prototype = new Assessor.Value;
+
+JXG.extend(Assessor.SlopeY.prototype, {
+    evaluate: function (elements, fixtures) {
+        return fixtures[this.line] ? fixtures[this.line][this.what]() : NaN;
+    },
+
+    choose: function (elements, fixtures) {
+        var new_fixtures = [], fix, i;
+
+        if (!fixtures[this.line]) {
+            for (i = 0; i < elements.lines.length; i++) {
+                fix = this.flatCopy(fixtures);
+                fix[this.line] = elements.lines[i];
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.what + '", "' + this.line + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});

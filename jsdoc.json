@@ -13,7 +13,10 @@
         "excludePattern": "(^|\\/)_"
     },
     "opts": {
-        "destination": "docs"
+        "destination": "docs",
+        "_": [
+                "README.md"
+        ]
     },
     "plugins": [],
     "jsVersion": 180

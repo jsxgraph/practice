@@ -1,11 +1,23 @@
-
-Assessor.Collinear = function (A, B, C) {
+/**
+ * Checks if three given points are collinear.
+ * @param {String} A
+ * @param {String} B
+ * @param {String} C
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Collinear = function (A, B, C) {
     this.class = "Collinear";
+
+    /**
+     * Stores the collinear points.
+     * @type {Array}
+     */
     this.points = [A, B, C];
 };
-Assessor.Collinear.prototype = new Assessor.Verifier;
+Assessor.Verifier.Collinear.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Collinear.prototype, {
+JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.Collinear.prototype */ {
     choose: function (elements, fixtures) {
         var i, j, k, fix, new_fixtures = [];
 
@@ -25,10 +37,10 @@ JXG.extend(Assessor.Collinear.prototype, {
         } else {
             this.log('point 1 not fixed yet');
             for (i = 0; i < elements.points.length; i++) {
-                if (fixtures[this.points[1]]) {
+                if (fixtures.get(this.points[1])) {
                     this.log('point2 fixed');
-                    fix = this.flatCopy(fixtures);
-                    fix[this.points[0]] = elements.points[i];
+                    fix = new Assessor.FixtureList(fixtures);
+                    fix.set(this.points[0], elements.points[i]);
 
                     if (this.verify(elements, fix)) {
                         new_fixtures.push(fix);
@@ -36,11 +48,11 @@ JXG.extend(Assessor.Collinear.prototype, {
                 } else {
                     this.log('point 2 not fixed yet');
                     for (j = 0; j < elements.points.length; j++) {
-                        if (fixtures[this.points[2]]) {
+                        if (fixtures.get(this.points[2])) {
                             this.log('point3 fixed');
-                            fix = this.flatCopy(fixtures);
-                            fix[this.points[0]] = elements.points[i];
-                            fix[this.points[1]] = elements.points[j];
+                            fix = new Assessor.FixtureList(fixtures);
+                            fix.set(this.points[0], elements.points[i]);
+                            fix.set(this.points[1], elements.points[j]);
 
                             if (this.verify(elements, fix)) {
                                 new_fixtures.push(fix);
@@ -48,10 +60,10 @@ JXG.extend(Assessor.Collinear.prototype, {
                         } else {
                             this.log('point 3 not fixed');
                             for (k = 0; k < elements.points.length; k++) {
-                                fix = this.flatCopy(fixtures);
-                                fix[this.points[0]] = elements.points[i];
-                                fix[this.points[1]] = elements.points[j];
-                                fix[this.points[2]] = elements.points[k];
+                                fix = new Assessor.FixtureList(fixtures);
+                                fix.set(this.points[0], elements.points[i]);
+                                fix.set(this.points[1], elements.points[j]);
+                                fix.set(this.points[2], elements.points[k]);
 
                                 if (this.verify(elements, fix)) {
                                     new_fixtures.push(fix);
@@ -74,9 +86,9 @@ JXG.extend(Assessor.Collinear.prototype, {
             return false;
         }
 
-        A = fixtures[this.points[0]];
-        B = fixtures[this.points[1]];
-        C = fixtures[this.points[2]];
+        A = fixtures.get(this.points[0]);
+        B = fixtures.get(this.points[1]);
+        C = fixtures.get(this.points[2]);
 
         res = A && B && C;
 
@@ -105,15 +117,40 @@ JXG.extend(Assessor.Collinear.prototype, {
     }
 });
 
-Assessor.Between = function (value, min, max) {
-    this.class = 'Between';
-    this.value = this.expandNumber(value);
-    this.min = this.expandNumber(min);
-    this.max = this.expandNumber(max);
-};
-Assessor.Between.prototype = new Assessor.Verifier;
 
-JXG.extend(Assessor.Between.prototype, {
+/**
+ * The value <tt>value</tt> has to be greater than or equal to <tt>min</tt> and lesser than
+ * or equal to <tt>max</tt>.
+ * @param {Number|Assessor.Value.Value} value
+ * @param {Number|Assessor.Value.Value} min
+ * @param {Number|Assessor.Value.Value} max
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Between = function (value, min, max) {
+    this.class = 'Between';
+
+    /**
+     * The value that is to be compared to {@link Assessor.Between#min} and {@link Assessor.Between#max}.
+     * @type {Assessor.Value}
+     */
+    this.value = Assessor.Utils.expandNumber(value);
+
+    /**
+     * The lower bound for {@link Assessor.Between#value}.
+     * @type {Assessor.Value}
+     */
+    this.min = Assessor.Utils.expandNumber(min);
+
+    /**
+     * The upper bound for {@link Assessor.Between#value}.
+     * @type {Assessor.Value}
+     */
+    this.max = Assessor.Utils.expandNumber(max);
+};
+Assessor.Verifier.Between.prototype = new Assessor.Verifier.Verifier;
+
+JXG.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Between.prototype */ {
     choose: function (elements, fixtures) {
         var vposs = this.value.choose(elements, fixtures),
             miposs, maposs, i, j, k, new_fixtures = [];
@@ -156,16 +193,39 @@ JXG.extend(Assessor.Between.prototype, {
 });
 
 
-Assessor.Equals = function (lhs, rhs, eps) {
+/**
+ * Compares two values and is valid only if those are equal or within a certain acceptance
+ * range defined by <tt>eps</tt>.
+ * @param {Number|Assessor.Value.Value} lhs
+ * @param {Number|Assessor.Value.Value} rhs
+ * @param {Number} [eps=1e-5]
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Equals = function (lhs, rhs, eps) {
     this.class = 'Equals';
-    this.lhs = this.expandNumber(lhs);
-    this.rhs = this.expandNumber(rhs);
 
+    /**
+     * Left hand side of the equation.
+     * @type {Assessor.Value}
+     */
+    this.lhs = Assessor.Utils.expandNumber(lhs);
+
+    /**
+     * Right hand side of the equation.
+     * @type {Assessor.Value}
+     */
+    this.rhs = Assessor.Utils.expandNumber(rhs);
+
+    /**
+     * Allow a small difference when comparing {@link Assessor.Equals#lhs} and {@link Assessor.Equals#rhs}.
+     * @type {Number}
+     */
     this.eps = eps || 1e-5;
 };
-Assessor.Equals.prototype = new Assessor.Verifier;
+Assessor.Verifier.Equals.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Equals.prototype, {
+JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
     choose: function (elements, fixtures) {
         var lposs = this.lhs.choose(elements, fixtures),
             rposs, new_fixtures = [], i, j;
@@ -201,28 +261,41 @@ JXG.extend(Assessor.Equals.prototype, {
 });
 
 
-Assessor.Line = function (l, A, B) {
+/**
+ * There exists a line and this line is defined by the two given points.
+ * @param {String} l Line
+ * @param {String} A Point
+ * @param {String} B Point
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Line = function (l, A, B) {
     this.class = 'Line';
+
+    /**
+     * Store the identifier of the line.
+     * @type {String}
+     */
     this.line = l;
+
+    /**
+     * The points defining the line
+     * @type {Array}
+     */
     this.points = [A, B];
 };
-Assessor.Line.prototype = new Assessor.Verifier;
+Assessor.Verifier.Line.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Line.prototype, {
+JXG.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.prototype */{
     choose: function (elements, fixtures) {
-        var new_fixtures = [], fix, i, j, push = false;
+        var new_fixtures = [], fix, i, j;
 
         for (i = 0; i < elements.lines.length; i++) {
-            fix = this.flatCopy(fixtures);
-
-            if (!fix[this.line]) {
-                fix[this.line] = elements.lines[i];
-            }
+            fix = new Assessor.FixtureList(fixtures);
+            fix.set(this.line, elements.lines[i]);
 
             for (j = 0; j < 2; j++) {
-                if (!fix[this.points[j]]) {
-                    fix[this.points[j]] = elements.lines[i]['point' + (j+1)];
-                }
+                fix.set(this.points[j], elements.lines[i]['point' + (j+1)]);
             }
 
             if (this.verify(elements, fix)) {
@@ -234,10 +307,13 @@ JXG.extend(Assessor.Line.prototype, {
     },
 
     verify: function (elements, fixtures) {
-        return fixtures[this.line]
-            && JXG.indexOf(elements.points, fixtures[this.line].point1) > -1 && JXG.indexOf(elements.points, fixtures[this.line].point2) > -1
-            && ((fixtures[this.line].point1 === fixtures[this.points[0]] && fixtures[this.line].point2 === fixtures[this.points[1]])
-            || (fixtures[this.line].point1 === fixtures[this.points[1]] && fixtures[this.line].point2 === fixtures[this.points[0]]));
+        var l = fixtures.get(this.line),
+            A = fixtures.get(this.points[0]),
+            B = fixtures.get(this.points[1]);
+
+        return l
+            && JXG.indexOf(elements.points, l.point1) > -1 && JXG.indexOf(elements.points, l.point2) > -1
+            && ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
     },
 
     toJSON: function () {
@@ -247,14 +323,23 @@ JXG.extend(Assessor.Line.prototype, {
 });
 
 
-Assessor.Angle = function (name, A, B, C) {
+/**
+ * The angle <tt>alpha</tt> is defined by three points <tt>A, B</tt>, and <tt>C</tt>.
+ * @param {String} alpha
+ * @param {String} A
+ * @param {String} B
+ * @param {String} C
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Angle = function (alpha, A, B, C) {
     this.class = 'Angle';
-    this.name = name;
+    this.name = alpha;
     this.points = [A, B, C];
 };
-Assessor.Angle.prototype = new Assessor.Verifier;
+Assessor.Verifier.Angle.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Angle.prototype, {
+JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
     choose: function (elements, fixtures) {
         var i, a, fix, new_fixtures = [];
 
@@ -262,14 +347,13 @@ JXG.extend(Assessor.Angle.prototype, {
         for (i = 0; i < elements.angles.length; i++) {
             a = elements.angles[i];
 
-            this.log('checking out angle', a.name, 'with value', a.Value()*180/Math.PI);
+            Assessor.Utils.log('checking out angle', a.name, 'with value', a.Value()*180/Math.PI);
 
-            fix = this.flatCopy(fixtures);
-
-            fix[this.name] = fix[this.name] || a;
-            fix[this.points[0]] = fix[this.points[0]] || JXG.getRef(a.board, a.parents[0]);
-            fix[this.points[1]] = fix[this.points[1]] || JXG.getRef(a.board, a.parents[1]);
-            fix[this.points[2]] = fix[this.points[2]] || JXG.getRef(a.board, a.parents[2]);
+            fix = new Assessor.FixtureList(fixtures);
+            fix.set(this.name, a);
+            fix.set(this.points[0], JXG.getRef(a.board, a.parents[0]));
+            fix.set(this.points[1], JXG.getRef(a.board, a.parents[1]));
+            fix.set(this.points[2], JXG.getRef(a.board, a.parents[2]));
 
             if (this.verify(elements, fix)) {
                 new_fixtures.push(fix);
@@ -280,31 +364,24 @@ JXG.extend(Assessor.Angle.prototype, {
     },
 
     verify: function (elements, fixtures) {
-        var a = fixtures[this.name];
+        var a = fixtures.get(this.name),
+            p = [fixtures.get(this.points[0]),
+                fixtures.get(this.points[1]),
+                fixtures.get(this.points[2])],
+            i;
 
         if (!a) {
             return false;
         }
-        // check if the dependencies and the fixtures work out
-        fixtures[this.points[0]] = fixtures[this.points[0]] || JXG.getRef(a.board, a.parents[0]);
-        if (fixtures[this.points[0]].id !== a.parents[0]) {
-            this.log('point 1 is wrong');
-            // nah, point1 is already set but doesn't match with what it is set to
-            return false;
-        }
 
-        fixtures[this.points[1]] = fixtures[this.points[1]] || JXG.getRef(a.board, a.parents[1]);
-        if (fixtures[this.points[1]].id !== a.parents[1]) {
-            this.log('point 2 is wrong');
-            // nah, point1 is already set but doesn't match with what it is set to
-            return false;
-        }
-
-        fixtures[this.points[2]] = fixtures[this.points[2]] || JXG.getRef(a.board, a.parents[2]);
-        if (fixtures[this.points[2]].id !== a.parents[2]) {
-            this.log('point 3 is wrong');
-            // nah, point1 is already set but doesn't match with what it is set to
-            return false;
+        for (i = 0; i < 3; i++) {
+            // check if the dependencies and the fixtures work out
+            p[i] = p[i] || JXG.getRef(a.board, a.parents[i]);
+            if (p[i].id !== a.parents[i]) {
+                // nah, point (i+1) is already set but doesn't match with what it is set to
+                Assessor.Utils.log('point', i + 1, 'is wrong');
+                return false;
+            }
         }
 
         return true;

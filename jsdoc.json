@@ -1,0 +1,20 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "includePattern": ".+\\.js(doc)?$",
+        "include": [
+                "src/assessor.js",
+                "src/verifier.js",
+                "src/value.js",
+                "src/utils.js"
+        ],
+        "excludePattern": "(^|\\/)_"
+    },
+    "opts": {
+        "destination": "docs"
+    },
+    "plugins": [],
+    "jsVersion": 180
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>practice: Class: FixtureList</title>
+    <title>practice: Class: Polygon</title>
     
     <script src="http://shjs.sourceforge.net/sh_main.min.js"> </script>
     <script src="http://shjs.sourceforge.net/lang/sh_javascript.min.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Class: FixtureList</h1>
+    <h1 class="page-title">Class: Polygon</h1>
     
     
 
@@ -27,7 +27,9 @@
     
 <header>
     <h2>
-    FixtureList
+        <span class="ancestors"><a href="Assessor.Verifier.html">.Verifier</a>.</span>
+    
+    Polygon
     </h2>
     
 </header>  
@@ -39,7 +41,7 @@
     
         
 <dt>
-    <h4 class="name" id="FixtureList"><span class="type-signature"></span>new FixtureList</h4>
+    <h4 class="name" id="Polygon"><span class="type-signature"></span>new Polygon</h4>
     
     
 </dt>
@@ -47,7 +49,7 @@
     
     
     <div class="description">
-        Tracks the fixtures.
+        Assume the existence of a polygon defined by the given points.
     </div>
     
     
@@ -67,8 +69,6 @@
 		<th>Type</th>
 		
 		
-		<th>Argument</th>
-		
 		
 		
 		
@@ -81,29 +81,42 @@
 	
         <tr>
             
-                <td class="name"><code>fl</code></td>
+                <td class="name"><code>p</code></td>
             
             
             <td class="type">
             
-                        <a href="Assessor.FixtureList.html">Assessor.FixtureList</a>
+                        String
                         
                     
             </td>
             
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>A|B|C|...</code></td>
+            
+            
+            <td class="type">
+            
+                        String
+                        
                     
-                
-                </td>
+            </td>
             
             
             
             
-            <td class="description last">Optional import the fixtures from this list.</td>
+            
+            <td class="description last">Arbitrary number of points</td>
         </tr>
 	
 	
@@ -131,7 +144,7 @@
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 134</li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 405</li></ul></dd>
 	
     
     
@@ -158,7 +171,7 @@
         <h3 class="subsection-title">Extends</h3>
         
         <ul>
-            <li><a href="Assessor.Base.html">Assessor.Base</a></li>
+            <li><a href="Assessor.Verifier.Verifier.html">Assessor.Verifier.Verifier</a></li>
         </ul>
     
     
@@ -275,55 +288,6 @@
         
             
 <dt>
-    <h4 class="name" id="list"><span class="type-signature"></span>list<span class="type-signature"> :Object</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        The property name is the element name as introduced by the assessment author and
-the property value is a reference to an element created during the actual assessment.
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 140</li></ul></dd>
-	
-    
-    
-	
-	
-	
-	
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
     <h4 class="name" id="namespace"><span class="type-signature"></span>namespace<span class="type-signature"> :String</span></h4>
     
     
@@ -418,29 +382,18 @@ in the main namespace.
     
 </dd>
 
-        </dl>
-    
-    
-    
-        <h3 class="subsection-title">Methods</h3>
         
-        <dl>
             
 <dt>
-    <h4 class="name" id="clear"><span class="type-signature"></span>clear</h4>
+    <h4 class="name" id="points"><span class="type-signature"></span>points<span class="type-signature"> :Array</span></h4>
     
     
 </dt>
 <dd>
     
-    
     <div class="description">
-        Clear all the fixtures.
+        An array of points that define the polygon.
     </div>
-    
-    
-    
-    
     
     
     
@@ -463,7 +416,7 @@ in the main namespace.
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 174</li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 418</li></ul></dd>
 	
     
     
@@ -475,18 +428,66 @@ in the main namespace.
 
     
     
-    
-    
-    
-    
-    
-    
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="get"><span class="type-signature"></span>get</h4>
+    <h4 class="name" id="polygon"><span class="type-signature"></span>polygon<span class="type-signature"> :String</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        A polygon.
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 412</li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+</dd>
+
+        </dl>
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
+        
+        <dl>
+            
+<dt>
+    <h4 class="name" id="choose"><span class="type-signature"></span>choose</h4>
     
     
 </dt>
@@ -494,7 +495,8 @@ in the main namespace.
     
     
     <div class="description">
-        Retrieve the current fixture of a given element.
+        Compiles a list of all fixtures that can be applied to this verifier while
+this verifier is still valid under the given fixtures.
     </div>
     
     
@@ -526,12 +528,12 @@ in the main namespace.
 	
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>elements</code></td>
             
             
             <td class="type">
             
-                        String
+                        <a href="Assessor.ElementList.html">Assessor.ElementList</a>
                         
                     
             </td>
@@ -544,112 +546,10 @@ in the main namespace.
         </tr>
 	
 	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 154</li></ul></dd>
-	
-    
-    
-	
-	
-	
-	
-</dl>
-
-    
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-		<span class="param-type">JXG.GeometryElement</span> 
-		
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="import"><span class="type-signature"></span>import</h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Import fixtures from another fixture list.
-    </div>
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
 	
         <tr>
             
-                <td class="name"><code>fl</code></td>
+                <td class="name"><code>fixtures</code></td>
             
             
             <td class="type">
@@ -691,251 +591,7 @@ in the main namespace.
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 182</li></ul></dd>
-	
-    
-    
-	
-	
-	
-	
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="remove"><span class="type-signature"></span>remove</h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Remove fixtures.
-    </div>
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 196</li></ul></dd>
-	
-    
-    
-	
-	
-	
-	
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="set"><span class="type-signature"></span>set</h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Add a new fixture.
-    </div>
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                        Object
-                        
-                    
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>element</code></td>
-            
-            
-            <td class="type">
-            
-                        JXG.GeometryElement
-                        
-                    
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 163</li></ul></dd>
-	
-    
-    
-	
-	
-	
-	
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="simplify"><span class="type-signature"></span>simplify</h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Replaces the target references by the elements names.
-    </div>
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 208</li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 253</li></ul></dd>
 	
     
     
@@ -954,6 +610,10 @@ in the main namespace.
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    An array of <a href="Assessor.FixtureList.html">Assessor.FixtureList</a> objects.
+</div>
+
 
 
 
@@ -963,7 +623,7 @@ in the main namespace.
 	</dt>
 	<dd>
 		
-		<span class="param-type">Object</span> 
+		<span class="param-type">Array</span> 
 		
 	</dd>
 </dl>
@@ -1050,6 +710,150 @@ in the main namespace.
     
 </dd>
 
+        
+            
+<dt>
+    <h4 class="name" id="verify"><span class="type-signature"></span>verify</h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Verifies this verifier object under the given fixtures.
+    </div>
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+            
+            <td class="type">
+            
+                        <a href="Assessor.ElementList.html">Assessor.ElementList</a>
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>fixtures</code></td>
+            
+            
+            <td class="type">
+            
+                        <a href="Assessor.FixtureList.html">Assessor.FixtureList</a>
+                        
+                    
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 263</li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+		<span class="param-type">Boolean</span> 
+		
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
         </dl>
     
     
@@ -1072,7 +876,7 @@ in the main namespace.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Mon Aug 06 2012 19:57:29 GMT+0200 (MESZ)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Mon Aug 06 2012 19:57:31 GMT+0200 (MESZ)
 </footer>
 
 <script> sh_highlightDocument(); </script>

@@ -399,6 +399,7 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
  * Assume the existence of a polygon defined by the given points.
  * @param {String} p
  * @param {String} A|B|C|... Arbitrary number of points
+ * @augments Assessor.Verifier.Verifier
  * @constructor
  */
 Assessor.Verifier.Polygon = function (p, A) {

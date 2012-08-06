@@ -387,6 +387,7 @@ JXG.extend(Assessor.Value.SlopeY.prototype, /** @lends Assessor.Value.SlopeY.pro
 /**
  * Counts the number of vertices of a polygon.
  * @param {String} p
+ * @augments Assessor.Value.Value
  * @constructor
  */
 Assessor.Value.Vertices = function (p) {

@@ -222,17 +222,26 @@
                             0.5
                         )
                     )
-                }/*,
+                },
                 righttriangle: {
                     name: 'Right triangle',
                     task: 'Draw a right triangle',
-                    constraints: new Assessor.ConstraintCollection(
-                        '{"class": "NumberElements", "parameters": ["point", 3, 3]}',
-                        '{"class": "NumberElements", "parameters": ["polygon", 1, 1]}',
-                        '{"class": "Polygon", "parameters": [3, 3, "triangle"]}',
-                        '{"class": "Angle3P", "parameters": [85, 95, "A", "B", "C"]}'
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Verifier.Equals(
+                            new Assessor.Value.NumberElements('points'), 3
+                        ),
+                        new Assessor.Verifier.Equals(
+                            new Assessor.Value.NumberElements('polygons'), 1
+                        ),
+                        new Assessor.Verifier.Polygon('p', 'A', 'B', 'C'),
+                        new Assessor.Verifier.Equals(
+                            new Assessor.Value.Vertices('p'), 3
+                        ),
+                        new Assessor.Verifier.Between(
+                            new Assessor.Value.Angle3P('D', 'E', 'F'), 87, 93
+                        )
                     )
-                }*/
+                }
             };
 
         window.conf = conf;

@@ -131,19 +131,19 @@ Assessor.Verifier.Between = function (value, min, max) {
     this.class = 'Between';
 
     /**
-     * The value that is to be compared to {@link Assessor.Between#min} and {@link Assessor.Between#max}.
+     * The value that is to be compared to {@link Assessor.Verifier.Between#min} and {@link Assessor.Verifier.Between#max}.
      * @type {Assessor.Value}
      */
     this.value = Assessor.Utils.expandNumber(value);
 
     /**
-     * The lower bound for {@link Assessor.Between#value}.
+     * The lower bound for {@link Assessor.Verifier.Between#value}.
      * @type {Assessor.Value}
      */
     this.min = Assessor.Utils.expandNumber(min);
 
     /**
-     * The upper bound for {@link Assessor.Between#value}.
+     * The upper bound for {@link Assessor.Verifier.Between#value}.
      * @type {Assessor.Value}
      */
     this.max = Assessor.Utils.expandNumber(max);
@@ -218,7 +218,8 @@ Assessor.Verifier.Equals = function (lhs, rhs, eps) {
     this.rhs = Assessor.Utils.expandNumber(rhs);
 
     /**
-     * Allow a small difference when comparing {@link Assessor.Equals#lhs} and {@link Assessor.Equals#rhs}.
+     * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
+     * and {@link Assessor.Verifier.Equals#rhs}.
      * @type {Number}
      */
     this.eps = eps || 1e-5;
@@ -341,7 +342,7 @@ Assessor.Verifier.Angle.prototype = new Assessor.Verifier.Verifier;
 
 JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
     choose: function (elements, fixtures) {
-        var i, a, fix, new_fixtures = [];
+        var i, j, a, fix, new_fixtures = [];
 
         // find all valid combinations depending on previous fixtures
         for (i = 0; i < elements.angles.length; i++) {
@@ -351,9 +352,10 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
 
             fix = new Assessor.FixtureList(fixtures);
             fix.set(this.name, a);
-            fix.set(this.points[0], JXG.getRef(a.board, a.parents[0]));
-            fix.set(this.points[1], JXG.getRef(a.board, a.parents[1]));
-            fix.set(this.points[2], JXG.getRef(a.board, a.parents[2]));
+
+            for (j = 0; j < 3; j++) {
+                fix.set(this.points[j], JXG.getRef(a.board, a.parents[j]));
+            }
 
             if (this.verify(elements, fix)) {
                 new_fixtures.push(fix);
@@ -389,6 +391,90 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
 
     toJSON: function () {
         this.parameters = '["' + this.name + '", "' + this.points.join('", "') + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+/**
+ * Assume the existence of a polygon defined by the given points.
+ * @param {String} p
+ * @param {String} A|B|C|... Arbitrary number of points
+ * @constructor
+ */
+Assessor.Verifier.Polygon = function (p, A) {
+    this.class = 'Polygon';
+
+    /**
+     * A polygon.
+     * @type {String}
+     */
+    this.polygon = p;
+
+    /**
+     * An array of points that define the polygon.
+     * @type {Array}
+     */
+    this.points = Array.prototype.slice.call(arguments, 1);
+};
+Assessor.Verifier.Polygon.prototype = new Assessor.Verifier.Verifier;
+
+JXG.extend(Assessor.Verifier.Polygon.prototype, {
+    choose: function (elements, fixtures) {
+        var i, j, p, fix, new_fixtures = [];
+
+        // find all valid combinations depending on previous fixtures
+        for (i = 0; i < elements.polygons.length; i++) {
+            p = elements.polygons[i];
+
+            if (this.points.length !== p.vertices.length - 1) {
+                continue;
+            }
+
+            Assessor.Utils.log('checking out polygon', p.name);
+
+            fix = new Assessor.FixtureList(fixtures);
+            fix.set(this.polygon, p);
+            for (j = 0; j < this.points.length; j++) {
+                fix.set(this.points[j], JXG.getRef(p.board, p.vertices[j]));
+            }
+
+            if (this.verify(elements, fix)) {
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    verify: function (elements, fixtures) {
+        var a = fixtures.get(this.polygon),
+            p = [],
+            i;
+
+        if (!a || a.vertices.length - 1 !== this.points.length) {
+            Assessor.Utils.log('polygon undefined or vertices length doesn\'t match', a);
+            return false;
+        }
+
+        for (i = 0; i < this.points.length; i++) {
+            p.push(fixtures.get(this.points[i]));
+        }
+
+        for (i = 0; i < this.points.length; i++) {
+            // check if the dependencies and the fixtures work out
+            p[i] = p[i] || a.vertices[i];
+            if (p[i].id !== a.vertices[i].id) {
+                // nah, point (i+1) is already set but doesn't match with what it is set to
+                Assessor.Utils.log('point', i + 1, 'is wrong');
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.polygon + '", "' + this.points.join('", "') + '"]';
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });

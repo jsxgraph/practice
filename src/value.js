@@ -383,3 +383,50 @@ JXG.extend(Assessor.Value.SlopeY.prototype, /** @lends Assessor.Value.SlopeY.pro
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
+
+/**
+ * Counts the number of vertices of a polygon.
+ * @param {String} p
+ * @constructor
+ */
+Assessor.Value.Vertices = function (p) {
+    this.class = 'Vertices';
+
+    /**
+     * A polygon.
+     * @type {String}
+     */
+    this.polygon = p;
+};
+Assessor.Value.Vertices.prototype = new Assessor.Value.Value;
+
+JXG.extend(Assessor.Value.Vertices.prototype, {
+    evaluate: function (elements, fixtures) {
+        var p = fixtures.get(this.polygon);
+
+        if (p) {
+            Assessor.Utils.log('polygon', this.polygon, 'has', p.vertices.length - 1, 'vertices');
+        }
+
+        return p && p.vertices ? p.vertices.length - 1 : NaN;
+    },
+
+    choose: function (elements, fixtures) {
+        var new_fixtures = [], fix, i;
+
+        if (!fixtures.get(this.line)) {
+            for (i = 0; i < elements.polygons.length; i++) {
+                fix = new Assessor.FixtureList(fixtures);
+                fix.set(this.polygon, elements.polygons[i]);
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.polygon + '"]';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});

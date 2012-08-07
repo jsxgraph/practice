@@ -192,7 +192,7 @@ JXG.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Bet
     },
 
     toJSON: function () {
-        this.parameters = '[' + this.value.toJSON() + ', ' + this.min + ', ' + this.max + ']';
+        this.parameters = '[' + this.value.toJSON() + ', ' + this.min.toJSON() + ', ' + this.max.toJSON() + ']';
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });

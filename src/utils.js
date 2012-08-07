@@ -71,15 +71,24 @@ Assessor.Utils = {
         var i, c, co, newc = [];
 
         for (i = 0; i < a.length; i++) {
-            if (typeof a[i] === 'string' || !a[i].expanded) {
-                Assessor.Utils.log('parsing', a[i]);
-                c = JSON.parse(a[i]);
+            if (!a[i].expanded) {
+                Assessor.Utils.log('not expaned');
+                if (typeof a[i] === 'string') {
+                    Assessor.Utils.log('parsing', a[i]);
+                    c = JSON.parse(a[i]);
+                } else {
+                    Assessor.Utils.log('got an object', a[i]);
+                    c = a[i];
+                }
+
                 if (c.namespace !== 'null') {
                     co = this.expand(Assessor[c.namespace][c.class], c.parameters);
                 } else {
                     co = this.expand(Assessor[c.class], c.parameters);
                 }
+                newc.push(co);
             } else {
+                Assessor.Utils.log('already expanded, push it to results');
                 newc.push(a[i]);
             }
         }

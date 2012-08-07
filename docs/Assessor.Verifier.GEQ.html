@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>practice: Class: Verifier</title>
+    <title>practice: Class: GEQ</title>
     
     <script src="http://shjs.sourceforge.net/sh_main.min.js"> </script>
     <script src="http://shjs.sourceforge.net/lang/sh_javascript.min.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Class: Verifier</h1>
+    <h1 class="page-title">Class: GEQ</h1>
     
     
 
@@ -29,7 +29,7 @@
     <h2>
         <span class="ancestors"><a href="Assessor.Verifier.html">.Verifier</a>.</span>
     
-    Verifier
+    GEQ
     </h2>
     
 </header>  
@@ -41,7 +41,7 @@
     
         
 <dt>
-    <h4 class="name" id="Verifier"><span class="type-signature"></span>new Verifier</h4>
+    <h4 class="name" id="GEQ"><span class="type-signature"></span>new GEQ</h4>
     
     
 </dt>
@@ -49,12 +49,145 @@
     
     
     <div class="description">
-        Verifier base class
+        Compares two <a href="Assessor.Value.Value.html">Assessor.Value.Value</a> objects and verifies only if the <tt>lhs</tt> value is greater
+than or equal to the <tt>rhs</tt> value.
     </div>
     
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>lhs</code></td>
+            
+            
+            <td class="type">
+            
+                        Number
+                         | 
+                    
+                        <a href="Assessor.Value.Value.html">Assessor.Value.Value</a>
+                        
+                    
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>rhs</code></td>
+            
+            
+            <td class="type">
+            
+                        Number
+                         | 
+                    
+                        <a href="Assessor.Value.Value.html">Assessor.Value.Value</a>
+                        
+                    
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>eps</code></td>
+            
+            
+            <td class="type">
+            
+                        Number
+                        
+                    
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                    1e-5
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -77,7 +210,7 @@
 	
 	
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 239</li></ul></dd>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 379</li></ul></dd>
 	
     
     
@@ -104,7 +237,7 @@
         <h3 class="subsection-title">Extends</h3>
         
         <ul>
-            <li><a href="Assessor.Base.html">Assessor.Base</a></li>
+            <li><a href="Assessor.Verifier.Binary.html">Assessor.Verifier.Binary</a></li>
         </ul>
     
     
@@ -170,6 +303,55 @@
         
             
 <dt>
+    <h4 class="name" id="eps"><span class="type-signature"></span>eps<span class="type-signature"> :Number</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Allow a small difference when comparing <a href="Assessor.Verifier.Equals.html#lhs">Assessor.Verifier.Equals#lhs</a>
+and <a href="Assessor.Verifier.Equals.html#rhs">Assessor.Verifier.Equals#rhs</a>.
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 388</li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="expanded"><span class="type-signature"></span>expanded<span class="type-signature"> :Boolean</span></h4>
     
     
@@ -205,6 +387,54 @@
 	
 	<dt class="tag-source">Source:</dt>
 	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 11</li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="lhs"><span class="type-signature"></span>lhs<span class="type-signature"> :<a href="Assessor.Value.html">Assessor.Value</a></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Left hand side of the equation.
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 215</li></ul></dd>
 	
     
     
@@ -302,6 +532,54 @@ in the main namespace.
 	
 	<dt class="tag-source">Source:</dt>
 	<dd class="tag-source"><ul class="dummy"><li>assessor.js, line 30</li></ul></dd>
+	
+    
+    
+	
+	
+	
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="rhs"><span class="type-signature"></span>rhs<span class="type-signature"> :<a href="Assessor.Value.html">Assessor.Value</a></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Right hand side of the equation.
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source"><ul class="dummy"><li>verifier.js, line 221</li></ul></dd>
 	
     
     
@@ -713,7 +991,7 @@ this verifier is still valid under the given fixtures.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Tue Aug 07 2012 20:40:33 GMT+0200 (MESZ)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3</a> on Tue Aug 07 2012 20:40:32 GMT+0200 (MESZ)
 </footer>
 
 <script> sh_highlightDocument(); </script>

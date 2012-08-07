@@ -37,6 +37,8 @@ Assessor.Base = function () {
     /**
      * Classname of the object the current instance is created from.
      * @type {String}
+     * @name class
+     * @memberOf Assessor.Base.prototype
      */
     this['class'] = 'Base';
 

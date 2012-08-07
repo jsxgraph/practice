@@ -9,6 +9,13 @@
 
 
 /**
+ * Namespace for all classes, namespaces and objects in practice.
+ * @namespace
+ */
+Assessor = {};
+
+
+/**
  * Base class for all classes inside the Assessor namespace.
  * @constructor
  */
@@ -31,7 +38,7 @@ Assessor.Base = function () {
      * Classname of the object the current instance is created from.
      * @type {String}
      */
-    this.class = 'Base';
+    this['class'] = 'Base';
 
     /**
      * JSON string representing the constructor parameters as elements of an array.
@@ -48,7 +55,7 @@ JXG.extend(Assessor.Base.prototype, /** @lends Assessor.Base.prototype */ {
     toJSON: function () {
         return '{' +
                 '"namespace": "' + (this.namespace || 'null') + '",' +
-                '"class": "' + this.class + '",' +
+                '"class": "' + this['class'] + '",' +
                 '"parameters": ' + this.parameters +
             '}';
     },
@@ -150,7 +157,7 @@ Assessor.FixtureList = function (fl) {
     this.list = {};
 
     if (fl) {
-        this.import(fl);
+        this['import'](fl);
     }
 };
 Assessor.FixtureList.prototype = new Assessor.Base;
@@ -161,7 +168,7 @@ JXG.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.proto
      * @param {String} name
      * @return {JXG.GeometryElement}
      */
-    get: function (name) {
+    'get': function (name) {
         return this.list[name];
     },
 
@@ -170,7 +177,7 @@ JXG.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.proto
      * @param {Object} name
      * @param {JXG.GeometryElement} element
      */
-    set: function (name, element) {
+    'set': function (name, element) {
         if (!this.list[name]) {
             this.list[name] = element;
         }
@@ -189,7 +196,7 @@ JXG.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.proto
      * Import fixtures from another fixture list.
      * @param {Assessor.FixtureList} fl
      */
-    import: function (fl) {
+    'import': function (fl) {
         var i;
 
         for (i in fl.list) {
@@ -248,7 +255,7 @@ Assessor.Value = {};
  */
 Assessor.Verifier.Verifier = function () {
     this.namespace = 'Verifier';
-    this.class = "Verifier";
+    this['class'] = "Verifier";
 };
 Assessor.Verifier.Verifier.prototype = new Assessor.Base;
 
@@ -282,7 +289,7 @@ JXG.extend(Assessor.Verifier.Verifier.prototype, /** @lends Assessor.Verifier.Ve
  */
 Assessor.Assessment = function () {
     this.namespace = null;
-    this.class = "Assessment";
+    this['class'] = "Assessment";
 
     /**
      * Holds the constraints for this assessment.
@@ -351,7 +358,7 @@ JXG.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.prototy
             Assessor.Utils.log('Constraint ' + constr.toJSON() + ' generated ' + poss.length + ' possibilities!');
             for (j = 0; j < poss.length; j++) {
                 Assessor.Utils.log('fixating', this.fixtures.simplify());
-                this.fixtures.import(poss[j]);
+                this.fixtures['import'](poss[j]);
                 if (this.next(elements, i + 1)) {
                     return true;
                 } else {
@@ -374,3 +381,4 @@ JXG.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.prototy
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
+

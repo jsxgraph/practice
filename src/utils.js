@@ -92,9 +92,9 @@ Assessor.Utils = {
                 }
 
                 if (c.namespace !== 'null') {
-                    co = this.expand(Assessor[c.namespace][c.class], c.parameters);
+                    co = this.expand(Assessor[c.namespace][c['class']], c.parameters);
                 } else {
-                    co = this.expand(Assessor[c.class], c.parameters);
+                    co = this.expand(Assessor[c['class']], c.parameters);
                 }
                 newc.push(co);
             } else {
@@ -143,3 +143,4 @@ Assessor.Utils = {
         }
     }
 };
+

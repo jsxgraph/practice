@@ -12,7 +12,7 @@
  */
 
 
-Assessor = {
+JXG.extend(Assessor, {
     initsketch: function () {
         if (typeof GUI !== 'undefined') {
             GUI.generator = JXG.deepCopy(GUI.generator, {
@@ -89,4 +89,4 @@ Assessor = {
         document.getElementById('debug').innerHTML = '';
     }
 
-};
+});

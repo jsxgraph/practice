@@ -19,7 +19,7 @@
  * @constructor
  */
 Assessor.Verifier.Collinear = function (A, B, C) {
-    this.class = "Collinear";
+    this['class'] = "Collinear";
 
     /**
      * Stores the collinear points.
@@ -143,7 +143,7 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
  * @constructor
  */
 Assessor.Verifier.Between = function (value, min, max) {
-    this.class = 'Between';
+    this['class'] = 'Between';
 
     /**
      * The value that is to be compared to {@link Assessor.Verifier.Between#min} and {@link Assessor.Verifier.Between#max}.
@@ -216,7 +216,7 @@ JXG.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Bet
  * @constructor
  */
 Assessor.Verifier.Binary = function (lhs, rhs) {
-    this.class = 'Binary';
+    this['class'] = 'Binary';
 
     /**
      * Left hand side of the equation.
@@ -271,7 +271,7 @@ JXG.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Bina
  */
 Assessor.Verifier.Equals = function (lhs, rhs, eps) {
     Assessor.Verifier.Binary.call(this, lhs, rhs);
-    this.class = 'Equals';
+    this['class'] = 'Equals';
 
     /**
      * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
@@ -306,7 +306,7 @@ JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equa
  */
 Assessor.Verifier.Less = function (lhs, rhs) {
     Assessor.Verifier.Binary.call(this, lhs, rhs);
-    this.class = 'Less';
+    this['class'] = 'Less';
 };
 Assessor.Verifier.Less.prototype = new Assessor.Verifier.Binary;
 
@@ -330,7 +330,7 @@ JXG.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.p
  */
 Assessor.Verifier.LEQ = function (lhs, rhs, eps) {
     Assessor.Verifier.Binary.call(this, lhs, rhs);
-    this.class = 'LEQ';
+    this['class'] = 'LEQ';
 
     /**
      * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
@@ -364,7 +364,7 @@ JXG.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.pro
  */
 Assessor.Verifier.Greater = function (lhs, rhs) {
     Assessor.Verifier.Binary.call(this, lhs, rhs);
-    this.class = 'Greater';
+    this['class'] = 'Greater';
 };
 Assessor.Verifier.Greater.prototype = new Assessor.Verifier.Binary;
 
@@ -388,7 +388,7 @@ JXG.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Gre
  */
 Assessor.Verifier.GEQ = function (lhs, rhs, eps) {
     Assessor.Verifier.Binary.call(this, lhs, rhs);
-    this.class = 'GEQ';
+    this['class'] = 'GEQ';
 
     /**
      * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
@@ -420,7 +420,7 @@ JXG.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.pro
  * @constructor
  */
 Assessor.Verifier.Not = function (v) {
-    this.class = 'Not';
+    this['class'] = 'Not';
 
     /**
      * The verifier that should not be verified.
@@ -456,7 +456,7 @@ JXG.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.pro
  * @constructor
  */
 Assessor.Verifier.Line = function (l, A, B) {
-    this.class = 'Line';
+    this['class'] = 'Line';
 
     /**
      * Store the identifier of the line.
@@ -519,7 +519,7 @@ JXG.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.p
  * @constructor
  */
 Assessor.Verifier.Angle = function (alpha, A, B, C) {
-    this.class = 'Angle';
+    this['class'] = 'Angle';
     this.name = alpha;
     this.points = [A, B, C];
 };
@@ -588,7 +588,7 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
  * @constructor
  */
 Assessor.Verifier.Polygon = function (p, A) {
-    this.class = 'Polygon';
+    this['class'] = 'Polygon';
 
     /**
      * A polygon.
@@ -666,3 +666,4 @@ JXG.extend(Assessor.Verifier.Polygon.prototype, {
 });
 
 // endregion EXISTENCE
+

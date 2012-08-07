@@ -15,7 +15,7 @@
  */
 Assessor.Value.Value = function () {
     this.namespace = 'Value';
-    this.class = 'Value';
+    this['class'] = 'Value';
     this.parameters = '[]';
 };
 Assessor.Value.Value.prototype = new Assessor.Base;
@@ -50,7 +50,7 @@ JXG.extend(Assessor.Value.Value.prototype, /** @lends Assessor.Value.Value.proto
  * @constructor
  */
 Assessor.Value.Number = function (value) {
-    this.class = 'Number';
+    this['class'] = 'Number';
 
     /**
      * Store the value.
@@ -84,7 +84,7 @@ JXG.extend(Assessor.Value.Number.prototype, /** @lends Assessor.Value.Number.pro
  * @constructor
  */
 Assessor.Value.NumberElements = function (what) {
-    this.class = 'NumberElements';
+    this['class'] = 'NumberElements';
     this.what = what;
 };
 Assessor.Value.NumberElements.prototype = new Assessor.Value.Value;
@@ -109,7 +109,7 @@ JXG.extend(Assessor.Value.NumberElements.prototype, /** @lends Assessor.Value.Nu
  * @constructor
  */
 Assessor.Value.Angle = function (a) {
-    this.class = 'Angle';
+    this['class'] = 'Angle';
 
     /**
      * Contains the angle identifier.
@@ -174,7 +174,7 @@ JXG.extend(Assessor.Value.Angle.prototype, /** @lends Assessor.Value.Angle.proto
  * @constructor
  */
 Assessor.Value.Angle3P = function (A, B, C) {
-    this.class = 'Angle3P';
+    this['class'] = 'Angle3P';
 
     /**
      * Contains the three points defining the angle.
@@ -240,7 +240,7 @@ JXG.extend(Assessor.Value.Angle3P.prototype, /** @lends Assessor.Value.Angle3P.p
  * @constructor
  */
 Assessor.Value.Distance = function (A, B) {
-    this.class = 'Distance';
+    this['class'] = 'Distance';
 
     /**
      * Contains the points.
@@ -301,7 +301,7 @@ JXG.extend(Assessor.Value.Distance.prototype, /** @lends Assessor.Value.Distance
  * @constructor
  */
 Assessor.Value.XY = function (A, what) {
-    this.class = 'XY';
+    this['class'] = 'XY';
 
     /**
      * The point which coordinate is to be measure.
@@ -352,7 +352,7 @@ JXG.extend(Assessor.Value.XY.prototype, /** @lends Assessor.Value.XY.prototype *
  * @constructor
  */
 Assessor.Value.SlopeY = function (l, what) {
-    this.class = 'SlopeY';
+    this['class'] = 'SlopeY';
 
     /**
      * An identifier for a line
@@ -401,7 +401,7 @@ JXG.extend(Assessor.Value.SlopeY.prototype, /** @lends Assessor.Value.SlopeY.pro
  * @constructor
  */
 Assessor.Value.Vertices = function (p) {
-    this.class = 'Vertices';
+    this['class'] = 'Vertices';
 
     /**
      * A polygon.
@@ -441,3 +441,4 @@ JXG.extend(Assessor.Value.Vertices.prototype, {
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
+

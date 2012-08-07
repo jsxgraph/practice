@@ -1,3 +1,13 @@
+/*
+    practice - JSXGraph practice and assessment framework
+
+    Copyright 2012
+        Michael Gerhäuser
+
+    Licensed under the LGPL v3
+*/
+
+
 /**
  * This namespaces contains a few misc helper functions and constants.
  * @namespace

@@ -1,3 +1,15 @@
+/*
+    practice - JSXGraph practice and assessment framework
+
+    Copyright 2012
+        Michael Gerhäuser
+
+    Licensed under the LGPL v3
+*/
+
+/**
+ * @fileoverview Helper functions for the practice examples in the example folder
+ */
 
 
 Assessor = {

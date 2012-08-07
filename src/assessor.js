@@ -1,3 +1,13 @@
+/*
+    practice - JSXGraph practice and assessment framework
+
+    Copyright 2012
+        Michael Gerhäuser
+
+    Licensed under the LGPL v3
+*/
+
+
 /**
  * Base class for all classes inside the Assessor namespace.
  * @constructor

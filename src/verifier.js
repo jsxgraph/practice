@@ -1,3 +1,5 @@
+// region GEOMETRIC
+
 /**
  * Checks if three given points are collinear.
  * @param {String} A
@@ -27,18 +29,18 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
                 this.points.push.apply(this.points, this.points.splice(i, 1));
             }
         }
-        this.log('number of points', elements.points.length);
+        Assessor.Utils.log('number of points', elements.points.length);
         // find all valid combinations depending on previous fixtures
 
         // all points fixed -> nothing to do
         if (fixtures[this.points[0]]) {
-            this.log('point1 fixed');
+            Assessor.Utils.log('point1 fixed');
             return [];
         } else {
-            this.log('point 1 not fixed yet');
+            Assessor.Utils.log('point 1 not fixed yet');
             for (i = 0; i < elements.points.length; i++) {
                 if (fixtures.get(this.points[1])) {
-                    this.log('point2 fixed');
+                    Assessor.Utils.log('point2 fixed');
                     fix = new Assessor.FixtureList(fixtures);
                     fix.set(this.points[0], elements.points[i]);
 
@@ -46,10 +48,10 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
                         new_fixtures.push(fix);
                     }
                 } else {
-                    this.log('point 2 not fixed yet');
+                    Assessor.Utils.log('point 2 not fixed yet');
                     for (j = 0; j < elements.points.length; j++) {
                         if (fixtures.get(this.points[2])) {
-                            this.log('point3 fixed');
+                            Assessor.Utils.log('point3 fixed');
                             fix = new Assessor.FixtureList(fixtures);
                             fix.set(this.points[0], elements.points[i]);
                             fix.set(this.points[1], elements.points[j]);
@@ -58,7 +60,7 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
                                 new_fixtures.push(fix);
                             }
                         } else {
-                            this.log('point 3 not fixed');
+                            Assessor.Utils.log('point 3 not fixed');
                             for (k = 0; k < elements.points.length; k++) {
                                 fix = new Assessor.FixtureList(fixtures);
                                 fix.set(this.points[0], elements.points[i]);
@@ -81,7 +83,7 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
     verify: function (elements, fixtures) {
         var A, B, C, res, proj, line;
 
-        this.log('collinear verifiy called');
+        Assessor.Utils.log('collinear verifiy called');
         if (this.points.length < 3) {
             return false;
         }
@@ -97,14 +99,14 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
         }
 
         if (res) {
-            this.log('lets test', A.name, B.name, C.name, ' for collinearity...');
+            Assessor.Utils.log('lets test', A.name, B.name, C.name, ' for collinearity...');
             line = JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
             proj = JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
 
             res =  JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
 
             if (res) {
-                this.log('collinear: ', A.name, B.name, C.name);
+                Assessor.Utils.log('collinear: ', A.name, B.name, C.name);
             }
         }
 
@@ -117,6 +119,9 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
     }
 });
 
+// endregion GEOMETRIC
+
+// region COMPARISON
 
 /**
  * The value <tt>value</tt> has to be greater than or equal to <tt>min</tt> and lesser than
@@ -192,18 +197,16 @@ JXG.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Bet
     }
 });
 
-
 /**
- * Compares two values and is valid only if those are equal or within a certain acceptance
- * range defined by <tt>eps</tt>.
+ * Base class for binary operators like {@link Assessor.Verifier.Equals} and
+ * {@link Assessor.Verifier.Less}.
  * @param {Number|Assessor.Value.Value} lhs
  * @param {Number|Assessor.Value.Value} rhs
- * @param {Number} [eps=1e-5]
  * @augments Assessor.Verifier.Verifier
  * @constructor
  */
-Assessor.Verifier.Equals = function (lhs, rhs, eps) {
-    this.class = 'Equals';
+Assessor.Verifier.Binary = function (lhs, rhs) {
+    this.class = 'Binary';
 
     /**
      * Left hand side of the equation.
@@ -216,17 +219,10 @@ Assessor.Verifier.Equals = function (lhs, rhs, eps) {
      * @type {Assessor.Value}
      */
     this.rhs = Assessor.Utils.expandNumber(rhs);
-
-    /**
-     * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
-     * and {@link Assessor.Verifier.Equals#rhs}.
-     * @type {Number}
-     */
-    this.eps = eps || 1e-5;
 };
-Assessor.Verifier.Equals.prototype = new Assessor.Verifier.Verifier;
+Assessor.Verifier.Binary.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
+JXG.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Binary.prototype */ {
     choose: function (elements, fixtures) {
         var lposs = this.lhs.choose(elements, fixtures),
             rposs, new_fixtures = [], i, j;
@@ -248,6 +244,35 @@ JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equa
         return new_fixtures;
     },
 
+    toJSON: function () {
+        this.parameters = '[' + this.lhs.toJSON() + ', ' + this.rhs.toJSON() + ']';
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+/**
+ * Compares two values and is valid only if those are equal or within a certain acceptance
+ * range defined by <tt>eps</tt>.
+ * @param {Number|Assessor.Value.Value} lhs
+ * @param {Number|Assessor.Value.Value} rhs
+ * @param {Number} [eps=1e-5]
+ * @augments Assessor.Verifier.Binary
+ * @constructor
+ */
+Assessor.Verifier.Equals = function (lhs, rhs, eps) {
+    Assessor.Verifier.Binary.call(this, lhs, rhs);
+    this.class = 'Equals';
+
+    /**
+     * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
+     * and {@link Assessor.Verifier.Equals#rhs}.
+     * @type {Number}
+     */
+    this.eps = eps || 1e-5;
+};
+Assessor.Verifier.Equals.prototype = new Assessor.Verifier.Binary;
+
+JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -256,12 +281,162 @@ JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equa
     },
 
     toJSON: function () {
-        this.parameters = '[' + this.lhs.toJSON() + ', ' + this.rhs.toJSON() + ']';
+        this.parameters = '[' + this.lhs.toJSON() + ', ' + this.rhs.toJSON() + ', ' + this.eps + ']';
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
 
+/**
+ * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is less
+ * than the <tt>rhs</tt> value.
+ * @param {Number|Assessor.Value.Value} lhs
+ * @param {Number|Assessor.Value.Value} rhs
+ * @augments Assessor.Verifier.Binary
+ * @constructor
+ */
+Assessor.Verifier.Less = function (lhs, rhs) {
+    Assessor.Verifier.Binary.call(this, lhs, rhs);
+    this.class = 'Less';
+};
+Assessor.Verifier.Less.prototype = new Assessor.Verifier.Binary;
 
+JXG.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.prototype */ {
+    verify: function (elements, fixtures) {
+        var lhs = this.lhs.evaluate(elements, fixtures),
+            rhs = this.rhs.evaluate(elements, fixtures);
+
+        return lhs < rhs;
+    }
+});
+
+/**
+ * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is less
+ * than or equal to the <tt>rhs</tt> value.
+ * @param {Number|Assessor.Value.Value} lhs
+ * @param {Number|Assessor.Value.Value} rhs
+ * @param {Number} [eps=1e-5]
+ * @augments Assessor.Verifier.Binary
+ * @constructor
+ */
+Assessor.Verifier.LEQ = function (lhs, rhs, eps) {
+    Assessor.Verifier.Binary.call(this, lhs, rhs);
+    this.class = 'LEQ';
+
+    /**
+     * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
+     * and {@link Assessor.Verifier.Equals#rhs}.
+     * @type {Number}
+     */
+    this.eps = eps || 1e-5;
+};
+Assessor.Verifier.LEQ.prototype = new Assessor.Verifier.Binary;
+
+JXG.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.prototype */ {
+    verify: function (elements, fixtures) {
+        var lhs = this.lhs.evaluate(elements, fixtures),
+            rhs = this.rhs.evaluate(elements, fixtures);
+
+        return lhs - rhs <= this.eps;
+    },
+
+    toJSON: function () {
+        return Assessor.Verifier.Equals.prototype.toJSON.call(this);
+    }
+});
+
+/**
+ * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is greater
+ * than the <tt>rhs</tt> value.
+ * @param {Number|Assessor.Value.Value} lhs
+ * @param {Number|Assessor.Value.Value} rhs
+ * @augments Assessor.Verifier.Binary
+ * @constructor
+ */
+Assessor.Verifier.Greater = function (lhs, rhs) {
+    Assessor.Verifier.Binary.call(this, lhs, rhs);
+    this.class = 'Greater';
+};
+Assessor.Verifier.Greater.prototype = new Assessor.Verifier.Binary;
+
+JXG.extend(Assessor.Verifier.Greater.prototype, /** Assessor.Verifier.Greater.prototype */ {
+    verify: function (elements, fixtures) {
+        var lhs = this.lhs.evaluate(elements, fixtures),
+            rhs = this.rhs.evaluate(elements, fixtures);
+
+        return lhs > rhs;
+    }
+});
+
+/**
+ * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is greater
+ * than or equal to the <tt>rhs</tt> value.
+ * @param {Number|Assessor.Value.Value} lhs
+ * @param {Number|Assessor.Value.Value} rhs
+ * @param {Number} [eps=1e-5]
+ * @augments Assessor.Verifier.Binary
+ * @constructor
+ */
+Assessor.Verifier.GEQ = function (lhs, rhs, eps) {
+    Assessor.Verifier.Binary.call(this, lhs, rhs);
+    this.class = 'GEQ';
+
+    /**
+     * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
+     * and {@link Assessor.Verifier.Equals#rhs}.
+     * @type {Number}
+     */
+    this.eps = eps || 1e-5;
+};
+Assessor.Verifier.GEQ.prototype = new Assessor.Verifier.Binary;
+
+JXG.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.prototype */ {
+    verify: function (elements, fixtures) {
+        var lhs = this.lhs.evaluate(elements, fixtures),
+            rhs = this.rhs.evaluate(elements, fixtures);
+
+        return lhs - rhs >= this.eps;
+    },
+
+    toJSON: function () {
+        return Assessor.Verifier.Equals.prototype.toJSON.call(this);
+    }
+});
+
+
+/**
+ * Verifies only of the given verifier does NOT verify.
+ * @param {Assessor.Verifier.Verifier} v
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Not = function (v) {
+    this.class = 'Not';
+
+    /**
+     * The verifier that should not be verified.
+     * @type {Assessor.Verifier.Verifier}
+     */
+    this.verifier = v;
+};
+Assessor.Verifier.Not.prototype = new Assessor.Verifier.Verifier;
+
+JXG.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
+    choose: function (elements, fixtures) {
+        return this.verifier.choose(elements, fixtures);
+    },
+
+    verify: function (elements, fixtures) {
+        return !this.verifier.verify(elements, fixtures);
+    },
+
+    toJSON: function () {
+        this.parameters = '[' + this.verifier.toJSON() + ']';
+    }
+});
+
+// endregion COMPARISON
+
+// region EXISTENCE
 /**
  * There exists a line and this line is defined by the two given points.
  * @param {String} l Line
@@ -479,3 +654,5 @@ JXG.extend(Assessor.Verifier.Polygon.prototype, {
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });
+
+// endregion EXISTENCE

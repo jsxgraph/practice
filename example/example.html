@@ -9,9 +9,9 @@
 
     <script type="text/javascript" src="../src/common.js"></script>
     <script type="text/javascript" src="../src/assessor.js"></script>
+    <script type="text/javascript" src="../src/utils.js"></script>
     <script type="text/javascript" src="../src/verifier.js"></script>
     <script type="text/javascript" src="../src/value.js"></script>
-    <script type="text/javascript" src="../src/utils.js"></script>
 
     <style type="text/css">
         #debug {
@@ -159,6 +159,9 @@
                         new Assessor.Verifier.Equals(
                             new Assessor.Value.NumberElements('angles'), 2
                         ),
+                        new Assessor.Verifier.LEQ(
+                            new Assessor.Value.NumberElements('points'), 5
+                        ),
                         new Assessor.Verifier.Angle('alpha', 'C', 'B', 'A'),
                         new Assessor.Verifier.Between(
                             new Assessor.Value.Angle('alpha'), 115, 125
@@ -239,6 +242,17 @@
                         ),
                         new Assessor.Verifier.Between(
                             new Assessor.Value.Angle3P('D', 'E', 'F'), 87, 93
+                        )
+                    )
+                },
+                notthreepoints: {
+                    name: 'Not three points',
+                    task: 'Draw anything as long as it does not contain three points.',
+                    constraints: new Assessor.Assessment(
+                        new Assessor.Verifier.Not(
+                            new Assessor.Verifier.Equals(
+                                new Assessor.Value.NumberElements('points'), 3
+                            )
                         )
                     )
                 }

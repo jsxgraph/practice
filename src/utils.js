@@ -72,6 +72,7 @@ Assessor.Utils = {
 
         for (i = 0; i < a.length; i++) {
             if (typeof a[i] === 'string' || !a[i].expanded) {
+                Assessor.Utils.log('parsing', a[i]);
                 c = JSON.parse(a[i]);
                 if (c.namespace !== 'null') {
                     co = this.expand(Assessor[c.namespace][c.class], c.parameters);
@@ -94,7 +95,7 @@ Assessor.Utils = {
     expandNumber: function(v) {
         var o = v;
 
-        if (!v.expanded) {
+        if (typeof v !== 'undefined' && !v.expanded) {
             o = this.expand(Assessor.Value.Number, [v]);
         }
 

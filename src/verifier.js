@@ -358,7 +358,7 @@ Assessor.Verifier.Greater = function (lhs, rhs) {
 };
 Assessor.Verifier.Greater.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Greater.prototype, /** Assessor.Verifier.Greater.prototype */ {
+JXG.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Greater.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);

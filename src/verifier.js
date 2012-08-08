@@ -29,7 +29,7 @@ Assessor.Verifier.Collinear = function (A, B, C) {
 };
 Assessor.Verifier.Collinear.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.Collinear.prototype */ {
+Assessor.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.Collinear.prototype */ {
     choose: function (elements, fixtures) {
         var i, j, k, fix, new_fixtures = [];
 
@@ -110,10 +110,10 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
 
         if (res) {
             Assessor.Utils.log('lets test', A.name, B.name, C.name, ' for collinearity...');
-            line = JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
-            proj = JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
+            line = Assessor.JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
+            proj = Assessor.JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
 
-            res =  JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
+            res =  Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
 
             if (res) {
                 Assessor.Utils.log('collinear: ', A.name, B.name, C.name);
@@ -165,7 +165,7 @@ Assessor.Verifier.Between = function (value, min, max) {
 };
 Assessor.Verifier.Between.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Between.prototype */ {
+Assessor.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Between.prototype */ {
     choose: function (elements, fixtures) {
         var vposs = this.value.choose(elements, fixtures),
             miposs, maposs, i, j, k, new_fixtures = [];
@@ -232,7 +232,7 @@ Assessor.Verifier.Binary = function (lhs, rhs) {
 };
 Assessor.Verifier.Binary.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Binary.prototype */ {
+Assessor.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Binary.prototype */ {
     choose: function (elements, fixtures) {
         var lposs = this.lhs.choose(elements, fixtures),
             rposs, new_fixtures = [], i, j;
@@ -282,7 +282,7 @@ Assessor.Verifier.Equals = function (lhs, rhs, eps) {
 };
 Assessor.Verifier.Equals.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
+Assessor.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -310,7 +310,7 @@ Assessor.Verifier.Less = function (lhs, rhs) {
 };
 Assessor.Verifier.Less.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.prototype */ {
+Assessor.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -341,7 +341,7 @@ Assessor.Verifier.LEQ = function (lhs, rhs, eps) {
 };
 Assessor.Verifier.LEQ.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.prototype */ {
+Assessor.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -368,7 +368,7 @@ Assessor.Verifier.Greater = function (lhs, rhs) {
 };
 Assessor.Verifier.Greater.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Greater.prototype */ {
+Assessor.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Greater.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -399,7 +399,7 @@ Assessor.Verifier.GEQ = function (lhs, rhs, eps) {
 };
 Assessor.Verifier.GEQ.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.prototype */ {
+Assessor.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -430,7 +430,7 @@ Assessor.Verifier.Not = function (v) {
 };
 Assessor.Verifier.Not.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
+Assessor.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
     choose: function (elements, fixtures) {
         return this.verifier.choose(elements, fixtures);
     },
@@ -472,7 +472,7 @@ Assessor.Verifier.Line = function (l, A, B) {
 };
 Assessor.Verifier.Line.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.prototype */{
+Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.prototype */{
     choose: function (elements, fixtures) {
         var new_fixtures = [], fix, i, j;
 
@@ -498,7 +498,7 @@ JXG.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.p
             B = fixtures.get(this.points[1]);
 
         return l
-            && JXG.indexOf(elements.points, l.point1) > -1 && JXG.indexOf(elements.points, l.point2) > -1
+            && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1
             && ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
     },
 
@@ -525,7 +525,7 @@ Assessor.Verifier.Angle = function (alpha, A, B, C) {
 };
 Assessor.Verifier.Angle.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
+Assessor.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
     choose: function (elements, fixtures) {
         var i, j, a, fix, new_fixtures = [];
 
@@ -539,7 +539,7 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
             fix.set(this.name, a);
 
             for (j = 0; j < 3; j++) {
-                fix.set(this.points[j], JXG.getRef(a.board, a.parents[j]));
+                fix.set(this.points[j], Assessor.JXG.getRef(a.board, a.parents[j]));
             }
 
             if (this.verify(elements, fix)) {
@@ -563,7 +563,7 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
 
         for (i = 0; i < 3; i++) {
             // check if the dependencies and the fixtures work out
-            p[i] = p[i] || JXG.getRef(a.board, a.parents[i]);
+            p[i] = p[i] || Assessor.JXG.getRef(a.board, a.parents[i]);
             if (p[i].id !== a.parents[i]) {
                 // nah, point (i+1) is already set but doesn't match with what it is set to
                 Assessor.Utils.log('point', i + 1, 'is wrong');
@@ -604,7 +604,7 @@ Assessor.Verifier.Polygon = function (p, A) {
 };
 Assessor.Verifier.Polygon.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Polygon.prototype, {
+Assessor.extend(Assessor.Verifier.Polygon.prototype, {
     choose: function (elements, fixtures) {
         var i, j, p, fix, new_fixtures = [];
 
@@ -621,7 +621,7 @@ JXG.extend(Assessor.Verifier.Polygon.prototype, {
             fix = new Assessor.FixtureList(fixtures);
             fix.set(this.polygon, p);
             for (j = 0; j < this.points.length; j++) {
-                fix.set(this.points[j], JXG.getRef(p.board, p.vertices[j]));
+                fix.set(this.points[j], Assessor.JXG.getRef(p.board, p.vertices[j]));
             }
 
             if (this.verify(elements, fix)) {

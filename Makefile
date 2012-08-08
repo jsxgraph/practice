@@ -1,5 +1,5 @@
 
-SRC=src/assessor.js src/utils.js src/verifier.js src/value.js
+SRC=src/assessor.js src/utils.js src/verifier.js src/value.js src/practice.js
 OUT=bin/practice.js
 MIN=bin/practice-min.js
 

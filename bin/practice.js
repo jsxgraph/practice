@@ -12,7 +12,20 @@
  * Namespace for all classes, namespaces and objects in practice.
  * @namespace
  */
-Assessor = {};
+Assessor = {
+    /**
+     * @private
+     */
+    JXG: typeof JXG !== 'undefined' ? JXG : null,
+
+    extend: function (o, e) {
+        var i;
+
+        for(i in e) {
+            o[i] = e[i];
+        }
+    }
+};
 
 
 /**
@@ -37,6 +50,8 @@ Assessor.Base = function () {
     /**
      * Classname of the object the current instance is created from.
      * @type {String}
+     * @name class
+     * @memberOf Assessor.Base.prototype
      */
     this['class'] = 'Base';
 
@@ -47,7 +62,7 @@ Assessor.Base = function () {
     this.parameters = '[]';
 };
 
-JXG.extend(Assessor.Base.prototype, /** @lends Assessor.Base.prototype */ {
+Assessor.extend(Assessor.Base.prototype, /** @lends Assessor.Base.prototype */ {
     /**
      * Generates a JSON representation of this object that can be used to restore it.
      * @return {String}
@@ -124,15 +139,15 @@ Assessor.ElementList = function (board) {
             continue;
         }
 
-        if (el.elementClass === JXG.OBJECT_CLASS_POINT) {
+        if (el.elementClass === Assessor.JXG.OBJECT_CLASS_POINT) {
             this.points.push(el);
-        } else if (el.elementClass === JXG.OBJECT_CLASS_LINE) {
+        } else if (el.elementClass === Assessor.JXG.OBJECT_CLASS_LINE) {
             this.lines.push(el);
-        } else if (el.elementClass === JXG.OBJECT_CLASS_CIRCLE) {
+        } else if (el.elementClass === Assessor.JXG.OBJECT_CLASS_CIRCLE) {
             this.circles.push(el);
-        } else if (el.type === JXG.OBJECT_TYPE_ANGLE) {
+        } else if (el.type === Assessor.JXG.OBJECT_TYPE_ANGLE) {
             this.angles.push(el);
-        } else if (el.type === JXG.OBJECT_TYPE_POLYGON) {
+        } else if (el.type === Assessor.JXG.OBJECT_TYPE_POLYGON) {
             this.polygons.push(el);
         }
     }
@@ -162,7 +177,7 @@ Assessor.FixtureList = function (fl) {
 };
 Assessor.FixtureList.prototype = new Assessor.Base;
 
-JXG.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.prototype */ {
+Assessor.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.prototype */ {
     /**
      * Retrieve the current fixture of a given element.
      * @param {String} name
@@ -259,7 +274,7 @@ Assessor.Verifier.Verifier = function () {
 };
 Assessor.Verifier.Verifier.prototype = new Assessor.Base;
 
-JXG.extend(Assessor.Verifier.Verifier.prototype, /** @lends Assessor.Verifier.Verifier.prototype */ {
+Assessor.extend(Assessor.Verifier.Verifier.prototype, /** @lends Assessor.Verifier.Verifier.prototype */ {
     /**
      * Compiles a list of all fixtures that can be applied to this verifier while
      * this verifier is still valid under the given fixtures.
@@ -305,7 +320,7 @@ Assessor.Assessment = function () {
 };
 Assessor.Assessment.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.prototype */ {
+Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.prototype */ {
     /**
      * Entry point for the verification algorithm.
      * @param {JXG.Board} board
@@ -559,7 +574,7 @@ Assessor.Verifier.Collinear = function (A, B, C) {
 };
 Assessor.Verifier.Collinear.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.Collinear.prototype */ {
+Assessor.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.Collinear.prototype */ {
     choose: function (elements, fixtures) {
         var i, j, k, fix, new_fixtures = [];
 
@@ -640,10 +655,10 @@ JXG.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.C
 
         if (res) {
             Assessor.Utils.log('lets test', A.name, B.name, C.name, ' for collinearity...');
-            line = JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
-            proj = JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
+            line = Assessor.JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
+            proj = Assessor.JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
 
-            res =  JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
+            res =  Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
 
             if (res) {
                 Assessor.Utils.log('collinear: ', A.name, B.name, C.name);
@@ -695,7 +710,7 @@ Assessor.Verifier.Between = function (value, min, max) {
 };
 Assessor.Verifier.Between.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Between.prototype */ {
+Assessor.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Between.prototype */ {
     choose: function (elements, fixtures) {
         var vposs = this.value.choose(elements, fixtures),
             miposs, maposs, i, j, k, new_fixtures = [];
@@ -762,7 +777,7 @@ Assessor.Verifier.Binary = function (lhs, rhs) {
 };
 Assessor.Verifier.Binary.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Binary.prototype */ {
+Assessor.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Binary.prototype */ {
     choose: function (elements, fixtures) {
         var lposs = this.lhs.choose(elements, fixtures),
             rposs, new_fixtures = [], i, j;
@@ -812,7 +827,7 @@ Assessor.Verifier.Equals = function (lhs, rhs, eps) {
 };
 Assessor.Verifier.Equals.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
+Assessor.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -840,7 +855,7 @@ Assessor.Verifier.Less = function (lhs, rhs) {
 };
 Assessor.Verifier.Less.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.prototype */ {
+Assessor.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -871,7 +886,7 @@ Assessor.Verifier.LEQ = function (lhs, rhs, eps) {
 };
 Assessor.Verifier.LEQ.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.prototype */ {
+Assessor.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -898,7 +913,7 @@ Assessor.Verifier.Greater = function (lhs, rhs) {
 };
 Assessor.Verifier.Greater.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Greater.prototype */ {
+Assessor.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Greater.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -929,7 +944,7 @@ Assessor.Verifier.GEQ = function (lhs, rhs, eps) {
 };
 Assessor.Verifier.GEQ.prototype = new Assessor.Verifier.Binary;
 
-JXG.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.prototype */ {
+Assessor.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.prototype */ {
     verify: function (elements, fixtures) {
         var lhs = this.lhs.evaluate(elements, fixtures),
             rhs = this.rhs.evaluate(elements, fixtures);
@@ -960,7 +975,7 @@ Assessor.Verifier.Not = function (v) {
 };
 Assessor.Verifier.Not.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
+Assessor.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
     choose: function (elements, fixtures) {
         return this.verifier.choose(elements, fixtures);
     },
@@ -1002,7 +1017,7 @@ Assessor.Verifier.Line = function (l, A, B) {
 };
 Assessor.Verifier.Line.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.prototype */{
+Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.prototype */{
     choose: function (elements, fixtures) {
         var new_fixtures = [], fix, i, j;
 
@@ -1028,7 +1043,7 @@ JXG.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.p
             B = fixtures.get(this.points[1]);
 
         return l
-            && JXG.indexOf(elements.points, l.point1) > -1 && JXG.indexOf(elements.points, l.point2) > -1
+            && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1
             && ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
     },
 
@@ -1055,7 +1070,7 @@ Assessor.Verifier.Angle = function (alpha, A, B, C) {
 };
 Assessor.Verifier.Angle.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
+Assessor.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
     choose: function (elements, fixtures) {
         var i, j, a, fix, new_fixtures = [];
 
@@ -1069,7 +1084,7 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
             fix.set(this.name, a);
 
             for (j = 0; j < 3; j++) {
-                fix.set(this.points[j], JXG.getRef(a.board, a.parents[j]));
+                fix.set(this.points[j], Assessor.JXG.getRef(a.board, a.parents[j]));
             }
 
             if (this.verify(elements, fix)) {
@@ -1093,7 +1108,7 @@ JXG.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle
 
         for (i = 0; i < 3; i++) {
             // check if the dependencies and the fixtures work out
-            p[i] = p[i] || JXG.getRef(a.board, a.parents[i]);
+            p[i] = p[i] || Assessor.JXG.getRef(a.board, a.parents[i]);
             if (p[i].id !== a.parents[i]) {
                 // nah, point (i+1) is already set but doesn't match with what it is set to
                 Assessor.Utils.log('point', i + 1, 'is wrong');
@@ -1134,7 +1149,7 @@ Assessor.Verifier.Polygon = function (p, A) {
 };
 Assessor.Verifier.Polygon.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Verifier.Polygon.prototype, {
+Assessor.extend(Assessor.Verifier.Polygon.prototype, {
     choose: function (elements, fixtures) {
         var i, j, p, fix, new_fixtures = [];
 
@@ -1151,7 +1166,7 @@ JXG.extend(Assessor.Verifier.Polygon.prototype, {
             fix = new Assessor.FixtureList(fixtures);
             fix.set(this.polygon, p);
             for (j = 0; j < this.points.length; j++) {
-                fix.set(this.points[j], JXG.getRef(p.board, p.vertices[j]));
+                fix.set(this.points[j], Assessor.JXG.getRef(p.board, p.vertices[j]));
             }
 
             if (this.verify(elements, fix)) {
@@ -1219,7 +1234,7 @@ Assessor.Value.Value = function () {
 };
 Assessor.Value.Value.prototype = new Assessor.Base;
 
-JXG.extend(Assessor.Value.Value.prototype, /** @lends Assessor.Value.Value.prototype */ {
+Assessor.extend(Assessor.Value.Value.prototype, /** @lends Assessor.Value.Value.prototype */ {
     /**
      * Evaluates this value.
      * @param {Assessor.ElementList} elements
@@ -1259,7 +1274,7 @@ Assessor.Value.Number = function (value) {
 };
 Assessor.Value.Number.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.Number.prototype, /** @lends Assessor.Value.Number.prototype */ {
+Assessor.extend(Assessor.Value.Number.prototype, /** @lends Assessor.Value.Number.prototype */ {
     evaluate: function (elements, fixtures) {
         return this.value;
     },
@@ -1288,7 +1303,7 @@ Assessor.Value.NumberElements = function (what) {
 };
 Assessor.Value.NumberElements.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.NumberElements.prototype, /** @lends Assessor.Value.NumberElements.prototype */ {
+Assessor.extend(Assessor.Value.NumberElements.prototype, /** @lends Assessor.Value.NumberElements.prototype */ {
     evaluate: function (elements, fixtures) {
         return elements[this.what].length;
     },
@@ -1319,7 +1334,7 @@ Assessor.Value.Angle = function (a) {
 };
 Assessor.Value.Angle.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.Angle.prototype, /** @lends Assessor.Value.Angle.prototype */ {
+Assessor.extend(Assessor.Value.Angle.prototype, /** @lends Assessor.Value.Angle.prototype */ {
     evaluate: function (elements, fixtures) {
         var A, B, C, res, a = fixtures.get(this.angle);
 
@@ -1327,14 +1342,14 @@ JXG.extend(Assessor.Value.Angle.prototype, /** @lends Assessor.Value.Angle.proto
             return false;
         }
 
-        A = JXG.getRef(a.board, a.parents[0]);
-        B = JXG.getRef(a.board, a.parents[1]);
-        C = JXG.getRef(a.board, a.parents[2]);
+        A = Assessor.JXG.getRef(a.board, a.parents[0]);
+        B = Assessor.JXG.getRef(a.board, a.parents[1]);
+        C = Assessor.JXG.getRef(a.board, a.parents[2]);
 
         res = A && B && C && A.id !== B.id && A.id !== C.id && B.id !== C.id;
 
         if (res) {
-            res = JXG.Math.Geometry.trueAngle(A, B, C);
+            res = Assessor.JXG.Math.Geometry.trueAngle(A, B, C);
 
             Assessor.Utils.log('angle &lt;' + A.name + B.name + C.name + ' = ' + res);
         } else {
@@ -1383,7 +1398,7 @@ Assessor.Value.Angle3P = function (A, B, C) {
 };
 Assessor.Value.Angle3P.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.Angle3P.prototype, /** @lends Assessor.Value.Angle3P.prototype */ {
+Assessor.extend(Assessor.Value.Angle3P.prototype, /** @lends Assessor.Value.Angle3P.prototype */ {
     evaluate: function (elements, fixtures) {
         var A, B, C, res;
 
@@ -1394,7 +1409,7 @@ JXG.extend(Assessor.Value.Angle3P.prototype, /** @lends Assessor.Value.Angle3P.p
         res = A && B && C && A.id !== B.id && A.id !== C.id && B.id !== C.id;
 
         if (res) {
-            res = JXG.Math.Geometry.trueAngle(A, B, C);
+            res = Assessor.JXG.Math.Geometry.trueAngle(A, B, C);
 
             Assessor.Utils.log('angle &lt;' + A.name + B.name + C.name + ' = ' + res);
         } else {
@@ -1449,7 +1464,7 @@ Assessor.Value.Distance = function (A, B) {
 };
 Assessor.Value.Distance.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.Distance.prototype, /** @lends Assessor.Value.Distance.prototype */ {
+Assessor.extend(Assessor.Value.Distance.prototype, /** @lends Assessor.Value.Distance.prototype */ {
     evaluate: function (elements, fixtures) {
         var A, B, res;
 
@@ -1516,7 +1531,7 @@ Assessor.Value.XY = function (A, what) {
 };
 Assessor.Value.XY.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.XY.prototype, /** @lends Assessor.Value.XY.prototype */ {
+Assessor.extend(Assessor.Value.XY.prototype, /** @lends Assessor.Value.XY.prototype */ {
     evaluate: function (elements, fixtures) {
         this.what = this.what.toLowerCase && this.what.toLowerCase() === 'y' ? 'Y' : 'X';
         return fixtures.get(this.point) ? fixtures.get(this.point)[this.what]() : NaN;
@@ -1567,7 +1582,7 @@ Assessor.Value.SlopeY = function (l, what) {
 };
 Assessor.Value.SlopeY.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.SlopeY.prototype, /** @lends Assessor.Value.SlopeY.prototype */ {
+Assessor.extend(Assessor.Value.SlopeY.prototype, /** @lends Assessor.Value.SlopeY.prototype */ {
     evaluate: function (elements, fixtures) {
         this.what = this.what.toLowerCase && this.what.toLowerCase() === 'slope' ? 'getSlope' : 'getRise';
         return fixtures.get(this.line) ? fixtures.get(this.line)[this.what]() : NaN;
@@ -1610,7 +1625,7 @@ Assessor.Value.Vertices = function (p) {
 };
 Assessor.Value.Vertices.prototype = new Assessor.Value.Value;
 
-JXG.extend(Assessor.Value.Vertices.prototype, {
+Assessor.extend(Assessor.Value.Vertices.prototype, {
     evaluate: function (elements, fixtures) {
         var p = fixtures.get(this.polygon);
 
@@ -1641,3 +1656,42 @@ JXG.extend(Assessor.Value.Vertices.prototype, {
     }
 });
 
+/*
+    practice - JSXGraph practice and assessment framework
+
+    Copyright 2012
+        Michael Gerhäuser
+
+    Licensed under the LGPL v3
+*/
+
+
+(function () {
+    var i, s, n, files = ['assessor', 'utils', 'verifier', 'value'],
+        requirePath = '';
+
+    var require = function(libraryName) {
+        document.write('<script type="text/javascript" src="' + libraryName + '"><\/script>');
+    };
+
+    if (typeof document !== 'undefined' && typeof Assessor === 'undefined') {
+        for (i=0;i<document.getElementsByTagName("script").length;i++) {
+            s = document.getElementsByTagName("script")[i];
+            if (s.src && s.src.match(/practice\.js(\?.*)?$/)) {
+                requirePath = s.src.replace(/practice\.js(\?.*)?$/,'');
+                for (n = 0; n < files.length; n++) {
+                    (function (include) {
+                        require(requirePath + include + '.js');
+                    })(files[n]);
+                }
+            }
+        }
+    }
+
+    if (typeof Assessor !== 'undefined' && typeof module !== 'undefined') {
+        module.exports = function (JXG) {
+            Assessor.JXG = JXG;
+            return Assessor;
+        };
+    }
+})();

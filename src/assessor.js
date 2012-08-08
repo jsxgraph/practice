@@ -12,7 +12,20 @@
  * Namespace for all classes, namespaces and objects in practice.
  * @namespace
  */
-Assessor = {};
+Assessor = {
+    /**
+     * @private
+     */
+    JXG: typeof JXG !== 'undefined' ? JXG : null,
+
+    extend: function (o, e) {
+        var i;
+
+        for(i in e) {
+            o[i] = e[i];
+        }
+    }
+};
 
 
 /**
@@ -49,7 +62,7 @@ Assessor.Base = function () {
     this.parameters = '[]';
 };
 
-JXG.extend(Assessor.Base.prototype, /** @lends Assessor.Base.prototype */ {
+Assessor.extend(Assessor.Base.prototype, /** @lends Assessor.Base.prototype */ {
     /**
      * Generates a JSON representation of this object that can be used to restore it.
      * @return {String}
@@ -126,15 +139,15 @@ Assessor.ElementList = function (board) {
             continue;
         }
 
-        if (el.elementClass === JXG.OBJECT_CLASS_POINT) {
+        if (el.elementClass === Assessor.JXG.OBJECT_CLASS_POINT) {
             this.points.push(el);
-        } else if (el.elementClass === JXG.OBJECT_CLASS_LINE) {
+        } else if (el.elementClass === Assessor.JXG.OBJECT_CLASS_LINE) {
             this.lines.push(el);
-        } else if (el.elementClass === JXG.OBJECT_CLASS_CIRCLE) {
+        } else if (el.elementClass === Assessor.JXG.OBJECT_CLASS_CIRCLE) {
             this.circles.push(el);
-        } else if (el.type === JXG.OBJECT_TYPE_ANGLE) {
+        } else if (el.type === Assessor.JXG.OBJECT_TYPE_ANGLE) {
             this.angles.push(el);
-        } else if (el.type === JXG.OBJECT_TYPE_POLYGON) {
+        } else if (el.type === Assessor.JXG.OBJECT_TYPE_POLYGON) {
             this.polygons.push(el);
         }
     }
@@ -164,7 +177,7 @@ Assessor.FixtureList = function (fl) {
 };
 Assessor.FixtureList.prototype = new Assessor.Base;
 
-JXG.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.prototype */ {
+Assessor.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.prototype */ {
     /**
      * Retrieve the current fixture of a given element.
      * @param {String} name
@@ -261,7 +274,7 @@ Assessor.Verifier.Verifier = function () {
 };
 Assessor.Verifier.Verifier.prototype = new Assessor.Base;
 
-JXG.extend(Assessor.Verifier.Verifier.prototype, /** @lends Assessor.Verifier.Verifier.prototype */ {
+Assessor.extend(Assessor.Verifier.Verifier.prototype, /** @lends Assessor.Verifier.Verifier.prototype */ {
     /**
      * Compiles a list of all fixtures that can be applied to this verifier while
      * this verifier is still valid under the given fixtures.
@@ -307,7 +320,7 @@ Assessor.Assessment = function () {
 };
 Assessor.Assessment.prototype = new Assessor.Verifier.Verifier;
 
-JXG.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.prototype */ {
+Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.prototype */ {
     /**
      * Entry point for the verification algorithm.
      * @param {JXG.Board} board

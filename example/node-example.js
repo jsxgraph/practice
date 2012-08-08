@@ -19,7 +19,18 @@ var board = JXG.JSXGraph.initBoard(null, {boundingbox: [-10, 10, 10, -10]}),
 
 board.jc.parse(answerAcute);
 
-if (assessment.verify(board)) {
+console.log(process.memoryUsage());
+
+var i, runs = 1, result,
+    start = new Date().getTime();
+
+for (i = 0; i < runs; i++) {
+    result = assessment.verify(board);
+}
+console.log(new Date().getTime() - start);
+console.log(process.memoryUsage());
+
+if (result) {
     console.log('Answer is correct.');
 } else {
     console.log('Answer is wrong.');

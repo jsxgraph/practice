@@ -514,7 +514,11 @@ Assessor.Utils = {
         var o = v;
 
         if (typeof v !== 'undefined' && !v.expanded) {
-            o = this.expand(Assessor.Value.Number, [v]);
+            if (typeof v === 'number') {
+                o = this.expand(Assessor.Value.Number, [v]);
+            } else {
+                o = this.expandJSON([v])[0];
+            }
         }
 
         return o;

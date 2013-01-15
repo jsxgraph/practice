@@ -477,15 +477,16 @@ Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.L
         var new_fixtures = [], fix, i, j;
 
         for (i = 0; i < elements.lines.length; i++) {
-            fix = new Assessor.FixtureList(fixtures);
-            fix.set(this.line, elements.lines[i]);
-
             for (j = 0; j < 2; j++) {
-                fix.set(this.points[j], elements.lines[i]['point' + (j+1)]);
-            }
+                fix = new Assessor.FixtureList(fixtures);
+                fix.set(this.line, elements.lines[i]);
 
-            if (this.verify(elements, fix)) {
-                new_fixtures.push(fix);
+                fix.set(this.points[j], elements.lines[i].point1);
+                fix.set(this.points[(j + 1) % 2], elements.lines[i].point2);
+
+                if (this.verify(elements, fix)) {
+                    new_fixtures.push(fix);
+                }
             }
         }
 
@@ -493,13 +494,16 @@ Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.L
     },
 
     verify: function (elements, fixtures) {
-        var l = fixtures.get(this.line),
+        var res,
+            l = fixtures.get(this.line),
             A = fixtures.get(this.points[0]),
             B = fixtures.get(this.points[1]);
 
-        return l
+        res = l
             && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1
             && ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
+
+        return res;
     },
 
     toJSON: function () {

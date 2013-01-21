@@ -544,7 +544,7 @@ Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.L
     choose: function (elements, fixtures) {
         var new_fixtures = [], fix, i, j;
 
-        if (fixtures.get(this.line)) {
+        if (fixtures.get(this.line) && !(this.points[0] || this.points[1])) {
             return [];
         }
 

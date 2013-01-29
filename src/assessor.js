@@ -317,6 +317,8 @@ Assessor.Assessment = function () {
      * @type {Assessor.FixtureList}
      */
     this.fixtures = new Assessor.FixtureList();
+
+    this.success = [];
 };
 Assessor.Assessment.prototype = new Assessor.Verifier.Verifier;
 
@@ -347,7 +349,8 @@ Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.pr
 
         if (i >= this.constraints.length) {
             Assessor.Utils.log('got a leaf!');
-            return true;
+            this.success.push(this.fixtures.simplify());
+            return false;
         }
 
         constr = this.constraints[i];

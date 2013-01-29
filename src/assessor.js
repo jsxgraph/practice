@@ -349,7 +349,12 @@ Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.pr
 
         if (i >= this.constraints.length) {
             Assessor.Utils.log('got a leaf!');
-            this.success.push(this.fixtures.simplify());
+            t = JXG.toJSON(this.fixtures.simplify());
+
+            if (JXG.indexOf(this.success, t) === -1) {
+                this.success.push(t);
+            }
+
             return false;
         }
 

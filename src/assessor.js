@@ -271,6 +271,8 @@ Assessor.Value = {};
 Assessor.Verifier.Verifier = function () {
     this.namespace = 'Verifier';
     this['class'] = "Verifier";
+
+    this.score = 0;
 };
 Assessor.Verifier.Verifier.prototype = new Assessor.Base;
 
@@ -359,13 +361,19 @@ Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.pr
      * @return {Boolean}
      */
     next: function (elements, i, success) {
-        var poss, constr, j, t;
+        var poss, constr, j, t, score = [], fixes;
 
         if (i >= this.constraints.length) {
             Assessor.Utils.log('got a leaf!');
 
             if (success) {
-                t = JXG.toJSON(this.fixtures.simplify());
+                for (j = 0; j < this.constraints.length; j++) {
+                    score = score.concat(this.constraints[j].score);
+                }
+
+                fixes = this.fixtures.simplify();
+                fixes._score_ = score;
+                t = JXG.toJSON(fixes);
 
                 if (JXG.indexOf(success, t) === -1) {
                     success.push(t);

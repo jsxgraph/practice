@@ -113,6 +113,8 @@ Assessor.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verif
             line = Assessor.JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
             proj = Assessor.JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
 
+            this.score = Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B);
+
             res =  Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
 
             if (res) {
@@ -472,6 +474,8 @@ Assessor.extend(Assessor.Verifier.Or.prototype, /** @lends Assessor.Verifier.Or.
     },
 
     verify: function (elements, fixtures) {
+        this.score = [this.verifiers[0].score, this.verifiers[1].score];
+
         return this.verifiers[0].verify(elements, fixtures) || this.verifiers[1].verify(elements, fixtures);
     },
 

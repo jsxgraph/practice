@@ -504,10 +504,12 @@ Assessor.Verifier.True.prototype = new Assessor.Verifier.Verifier;
 
 Assessor.extend(Assessor.Verifier.True.prototype, /** @lends Assessor.Verifier.True.prototype */ {
     choose: function (elements, fixtures) {
+        this.score = this.verifier.score;
         return this.verifier.choose(elements, fixtures);
     },
 
     verify: function (elements, fixtures) {
+        this.score = this.verifier.score;
         return true;
     },
 

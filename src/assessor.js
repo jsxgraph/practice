@@ -223,7 +223,7 @@ Assessor.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.
 
     /**
      * Remove fixtures.
-     * @params {Assessor.FixtureList} fl
+     * @param {Assessor.FixtureList} fl
      */
     remove: function (fl) {
         var i;

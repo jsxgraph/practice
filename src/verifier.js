@@ -450,37 +450,87 @@ Assessor.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.No
 
 // region LOGICAL
 
-/**
- * Verifies the one of the given verifier verifies.
- * @param {Assessor.Verifier.Verifier} v1
- * @param {Assessor.Verifier.Verifier} v2
+/** * Verifies the one of the given verifier verifies.
+ * @param {Array} v
  * @augments Assessor.Verifier.Verifier
  * @constructor
  */
-Assessor.Verifier.Or = function (v1, v2) {
+Assessor.Verifier.Or = function (v) {
     this['class'] = 'Or';
 
     /**
      * The verifier that should not be verified.
      * @type {Assessor.Verifier.Verifier}
      */
-    this.verifiers = [v1, v2];
+    this.verifiers = v;
 };
-Assessor.Verifier.Or.prototype = new Assessor.Verifier.Verifier;
+Assessor.Verifier.Or.prototype = new Assessor.Verifier.Verifier();
 
 Assessor.extend(Assessor.Verifier.Or.prototype, /** @lends Assessor.Verifier.Or.prototype */ {
     choose: function (elements, fixtures) {
-        return this.verifiers[0].choose(elements, fixtures).concat(this.verifiers[1].choose(elements, fixtures));
+        var i,
+            fix = [];
+
+        for (i = 0; i < this.verifiers.length; i++) {
+            fix = fix.concat(this.verifiers[i].choose(elements, fixtures));
+        }
+
+        return fix;
     },
 
     verify: function (elements, fixtures) {
-        this.score = [this.verifiers[0].score, this.verifiers[1].score];
+        var i,
+            result = false;
 
-        return this.verifiers[0].verify(elements, fixtures) || this.verifiers[1].verify(elements, fixtures);
+        this.score = [];
+        for (i = 0; i < this.verifiers.length; i++) {
+            result = result || this.verifiers[i].verify(elements, fixtures);
+            this.score.push(this.verifiers[i].score);
+        }
+
+        return result;
     },
 
     toJSON: function () {
-        this.parameters = '[' + this.verifiers[0].toJSON() + ', ' + this.verifiers[1].toJSON() + ']';
+        var i;
+
+        this.parameters = '[[';
+        for (i = 0; i < this.verifiers.length; i++) {
+            this.parameters += this.verifiers[i].toJSON();
+        }
+        this.parameters += ']]';
+    }
+});
+
+
+/** * Verifies that all of the given verifier verify.
+ * @param {Array} v
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.And = function (v) {
+    this['class'] = 'And';
+
+    /**
+     * The verifier that should not be verified.
+     * @type {Assessor.Verifier.Verifier}
+     */
+    this.verifiers = v;
+};
+Assessor.Verifier.And.prototype = new Assessor.Verifier.Or();
+
+Assessor.extend(Assessor.Verifier.And.prototype, /** @lends Assessor.Verifier.And.prototype */ {
+    verify: function (elements, fixtures) {
+        var i,
+            result = true;
+
+        this.score = [];
+        for (i = 0; i < this.verifiers.length; i++) {
+            result = result && this.verifiers[i].verify(elements, fixtures);
+            this.score.push(this.verifiers[i].score);
+        }
+
+        return result;
     }
 });
 
@@ -509,7 +559,9 @@ Assessor.extend(Assessor.Verifier.True.prototype, /** @lends Assessor.Verifier.T
     },
 
     verify: function (elements, fixtures) {
+        this.verifier.verify(elements, fixtures);
         this.score = this.verifier.score;
+
         return true;
     },
 
@@ -517,6 +569,8 @@ Assessor.extend(Assessor.Verifier.True.prototype, /** @lends Assessor.Verifier.T
         this.parameters = '[' + this.verifier.toJSON() + ']';
     }
 });
+
+Assessor.Verifier.Optional = Assessor.Verifier.True;
 
 // endregion LOGICAL
 
@@ -577,7 +631,7 @@ Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.L
             A = fixtures.get(this.points[0]),
             B = fixtures.get(this.points[1]);
 
-        res = l;
+        res = l && (l.elementClass === JXG.OBJECT_CLASS_LINE);
 
         if (this.points[0] && this.points[1]) {
             res = res && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1 &&

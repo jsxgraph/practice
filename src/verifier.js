@@ -494,11 +494,11 @@ Assessor.extend(Assessor.Verifier.Or.prototype, /** @lends Assessor.Verifier.Or.
     toJSON: function () {
         var i;
 
-        this.parameters = '[[';
+        this.parameters = [];
         for (i = 0; i < this.verifiers.length; i++) {
-            this.parameters += this.verifiers[i].toJSON();
+            this.parameters.push(this.verifiers[i].toJSON());
         }
-        this.parameters += ']]';
+        this.parameters = '[[' + this.parameters.join(', ') + ']]';
     }
 });
 

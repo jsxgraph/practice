@@ -469,13 +469,20 @@ Assessor.Verifier.Or.prototype = new Assessor.Verifier.Verifier();
 Assessor.extend(Assessor.Verifier.Or.prototype, /** @lends Assessor.Verifier.Or.prototype */ {
     choose: function (elements, fixtures) {
         var i,
-            fix = [];
+            fix = [],
+            result = [];
 
         for (i = 0; i < this.verifiers.length; i++) {
             fix = fix.concat(this.verifiers[i].choose(elements, fixtures));
         }
 
-        return fix;
+        for (i = 0; i < fix.length; i++) {
+            if (this.verify(elements, fix[i])) {
+                result.push(fix[i]);
+            }
+        }
+
+        return result;
     },
 
     verify: function (elements, fixtures) {
@@ -575,6 +582,59 @@ Assessor.Verifier.Optional = Assessor.Verifier.True;
 // endregion LOGICAL
 
 // region EXISTENCE
+/**
+ * There exists a line and this line is defined by the two given points.
+ * @param {String} A Point
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Point = function (A) {
+    this['class'] = 'Point';
+
+    /**
+     * The points defining the line
+     * @type {Array}
+     */
+    this.point = A;
+};
+Assessor.Verifier.Point.prototype = new Assessor.Verifier.Verifier();
+
+Assessor.extend(Assessor.Verifier.Point.prototype, /** @lends Assessor.Verifier.Point.prototype */{
+    choose: function (elements, fixtures) {
+        var new_fixtures = [], fix, i, j;
+
+        if (fixtures.get(this.point)) {
+            return [];
+        }
+
+        for (i = 0; i < elements.points.length; i++) {
+            fix = new Assessor.FixtureList(fixtures);
+            fix.set(this.point, elements.points[i]);
+            if (this.verify(elements, fix)) {
+                new_fixtures.push(fix);
+            }
+        }
+
+        return new_fixtures;
+    },
+
+    verify: function (elements, fixtures) {
+        var res,
+            p = fixtures.get(this.point);
+
+        res = p && (p.elementClass === JXG.OBJECT_CLASS_POINT);
+
+        return res;
+    },
+
+    toJSON: function () {
+        this.parameters = '["' + this.point + '"]';
+
+        return Assessor.Base.prototype.toJSON.call(this);
+    }
+});
+
+
 /**
  * There exists a line and this line is defined by the two given points.
  * @param {String} l Line

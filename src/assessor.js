@@ -190,6 +190,26 @@
     };
     Assessor.FixtureList.prototype = new Assessor.Base();
 
+    /**
+     * Expand a simplified FixtureList into a FixtureList.
+     * @param {string} list
+     * @param {object} elements
+     * @static
+     */
+    Assessor.FixtureList.expand = function (list, elements) {
+        var i,
+            r = {},
+            t = JSON.parse(list);
+
+        for (i in t) {
+            if (t.hasOwnProperty(i)) {
+                r[i] = elements[t[i]] || t[i];
+            }
+        }
+
+        return r;
+    };
+
     Assessor.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.prototype */ {
         /**
          * Retrieve the current fixture of a given element.
@@ -222,15 +242,21 @@
 
         /**
          * Import fixtures from another fixture list.
-         * @param {Assessor.FixtureList} fl
+         * @param {string|Assessor.FixtureList} fl A FixtureList or a simplified list in a string.
          */
         'import': function (fl) {
-            var i;
+            var i, l;
 
-            for (i in fl.list) {
-                if (fl.list.hasOwnProperty(i)) {
+            if (fl.list) {
+                l = fl.list;
+            } else {
+                l = fl;
+            }
+
+            for (i in l) {
+                if (l.hasOwnProperty(i)) {
                     if (!this.list[i]) {
-                        this.list[i] = fl.list[i];
+                        this.list[i] = l[i];
                     }
                 }
             }
@@ -259,7 +285,7 @@
 
             for (i in this.list) {
                 if (this.list.hasOwnProperty(i)) {
-                    t[i] = this.list[i].name;
+                    t[i] = this.list[i].name || this.list[i];
                 }
             }
 
@@ -347,12 +373,16 @@
         /**
          * Entry point for the verification algorithm.
          * @param {JXG.Board} board
+         * @param {Assessor.FixtureList} [fl]
          * @return {Boolean}
          */
-        verify: function (board) {
+        verify: function (board, fl) {
             var e = new Assessor.ElementList(board);
 
             this.fixtures.clear();
+            if (fl) {
+                this.fixtures['import'](fl);
+            }
 
             return this.next(e, 0);
         },
@@ -361,11 +391,15 @@
          * Collect all valid fixtures, not just the first one.
          * @param {JXG.Board} board
          * @param {Array} success
+         * @param {Assessor.FixtureList} [fl]
          */
-        collect: function (board, success) {
+        collect: function (board, success, fl) {
             var e = new Assessor.ElementList(board);
 
             this.fixtures.clear();
+            if (fl) {
+                this.fixtures['import'](fl);
+            }
 
             this.next(e, 0, success);
 

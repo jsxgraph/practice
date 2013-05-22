@@ -473,8 +473,6 @@
                 sum += this.values[i].evaluate(elements, fixtures);
             }
 
-            console.log('sum value', sum);
-
             return sum;
         },
 
@@ -490,6 +488,44 @@
                 this.parameters.push(this.values[i].toJSON());
             }
             this.parameters = '[' + this.parameters.join(', ') + ']';
+            return Assessor.Base.prototype.toJSON.call(this);
+        }
+    });
+
+    /**
+     * Quotient of v1 and v2.
+     * @param {Assessor.Value.Value} v1
+     * @param {Assessor.Value.Value} v2
+     * @constructor
+     */
+    Assessor.Value.Div = function (v1, v2) {
+        this['class'] = 'Div';
+
+        /**
+         * Dividend.
+         * @type Assessor.Value.Value
+         */
+        this.v1 = v1;
+
+        /**
+         * Divisor.
+         * @type Assessor.Value.Value
+         */
+        this.v2 = v2;
+    };
+    Assessor.Value.Sum.prototype = new Assessor.Value.Value();
+
+    Assessor.extend(Assessor.Value.Sum.prototype, {
+        evaluate: function (elements, fixtures) {
+            return this.v1.evaluate() / this.v2.evaluate();
+        },
+
+        choose: function (elements, fixtures) {
+            return [];
+        },
+
+        toJSON: function () {
+            this.parameters = '[' + this.v1.toJSON() + ', ' + this.v2.toJSON() + ']';
             return Assessor.Base.prototype.toJSON.call(this);
         }
     });

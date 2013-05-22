@@ -285,7 +285,7 @@
 
             for (i in this.list) {
                 if (this.list.hasOwnProperty(i)) {
-                    t[i] = this.list[i].name || this.list[i];
+                    t[i] = this.list[i].id || this.list[i];
                 }
             }
 

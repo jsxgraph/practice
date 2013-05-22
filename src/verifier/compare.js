@@ -295,4 +295,26 @@
         }
     });
 
+    Assessor.Verifier.Score = function (val) {
+        this['class'] = 'Score';
+
+        this.val = val;
+    };
+    Assessor.Verifier.Score.prototype = new Assessor.Verifier.Verifier();
+
+    Assessor.extend(Assessor.Verifier.Score.prototype, /** Assessor.Verifier.Score.prototype */ {
+        choose: function (elements, fixtures) {
+            return this.val.choose(elements, fixtures);
+        },
+
+        verify: function (elements, fixtures) {
+            this.score = [this.val.evaluate(elements, fixtures)];
+            return true;
+        },
+
+        toJSON: function () {
+            this.parameters = '[' + this.val.toJSON() + ']';
+        }
+    });
+
 }(this));

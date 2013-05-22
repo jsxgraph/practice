@@ -505,22 +505,23 @@
          * Dividend.
          * @type Assessor.Value.Value
          */
-        this.v1 = v1;
+        this.v1 = Assessor.Utils.expandNumber(v1);
 
         /**
          * Divisor.
          * @type Assessor.Value.Value
          */
-        this.v2 = v2;
+        this.v2 = Assessor.Utils.expandNumber(v2);
     };
     Assessor.Value.Div.prototype = new Assessor.Value.Value();
 
     Assessor.extend(Assessor.Value.Div.prototype, {
         evaluate: function (elements, fixtures) {
-            return this.v1.evaluate() / this.v2.evaluate();
+            return this.v1.evaluate(elements, fixtures) / this.v2.evaluate(elements, fixtures);
         },
 
         choose: function (elements, fixtures) {
+            this.score = [this.evaluate(elements, fixtures)];
             return [];
         },
 

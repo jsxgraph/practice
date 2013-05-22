@@ -304,7 +304,7 @@
 
     Assessor.extend(Assessor.Verifier.Score.prototype, /** Assessor.Verifier.Score.prototype */ {
         choose: function (elements, fixtures) {
-            return this.val.choose(elements, fixtures);
+            return [];
         },
 
         verify: function (elements, fixtures) {

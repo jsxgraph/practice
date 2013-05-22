@@ -295,35 +295,4 @@
         }
     });
 
-
-    /**
-     * Verifies only of the given verifier does NOT verify.
-     * @param {Assessor.Verifier.Verifier} v
-     * @augments Assessor.Verifier.Verifier
-     * @constructor
-     */
-    Assessor.Verifier.Not = function (v) {
-        this['class'] = 'Not';
-
-        /**
-         * The verifier that should not be verified.
-         * @type {Assessor.Verifier.Verifier}
-         */
-        this.verifier = v;
-    };
-    Assessor.Verifier.Not.prototype = new Assessor.Verifier.Verifier();
-
-    Assessor.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
-        choose: function (elements, fixtures) {
-            return this.verifier.choose(elements, fixtures);
-        },
-
-        verify: function (elements, fixtures) {
-            return !this.verifier.verify(elements, fixtures);
-        },
-
-        toJSON: function () {
-            this.parameters = '[' + this.verifier.toJSON() + ']';
-        }
-    });
 }(this));

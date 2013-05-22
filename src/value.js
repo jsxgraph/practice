@@ -513,9 +513,9 @@
          */
         this.v2 = v2;
     };
-    Assessor.Value.Sum.prototype = new Assessor.Value.Value();
+    Assessor.Value.Div.prototype = new Assessor.Value.Value();
 
-    Assessor.extend(Assessor.Value.Sum.prototype, {
+    Assessor.extend(Assessor.Value.Div.prototype, {
         evaluate: function (elements, fixtures) {
             return this.v1.evaluate() / this.v2.evaluate();
         },

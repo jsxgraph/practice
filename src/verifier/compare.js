@@ -287,7 +287,7 @@
             var lhs = this.lhs.evaluate(elements, fixtures),
                 rhs = this.rhs.evaluate(elements, fixtures);
 
-            return lhs - rhs >= this.eps;
+            return lhs - rhs >= -this.eps;
         },
 
         toJSON: function () {

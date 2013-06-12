@@ -113,6 +113,8 @@ Assessor.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verif
             line = Assessor.JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
             proj = Assessor.JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
 
+            this.score = Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B);
+
             res =  Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1))/A.Dist(B) < 0.07;
 
             if (res) {
@@ -446,6 +448,78 @@ Assessor.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.No
 
 // endregion COMPARISON
 
+// region LOGICAL
+
+/**
+ * Verifies the one of the given verifier verifies.
+ * @param {Assessor.Verifier.Verifier} v1
+ * @param {Assessor.Verifier.Verifier} v2
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.Or = function (v1, v2) {
+    this['class'] = 'Or';
+
+    /**
+     * The verifier that should not be verified.
+     * @type {Assessor.Verifier.Verifier}
+     */
+    this.verifiers = [v1, v2];
+};
+Assessor.Verifier.Or.prototype = new Assessor.Verifier.Verifier;
+
+Assessor.extend(Assessor.Verifier.Or.prototype, /** @lends Assessor.Verifier.Or.prototype */ {
+    choose: function (elements, fixtures) {
+        return this.verifiers[0].choose(elements, fixtures).concat(this.verifiers[1].choose(elements, fixtures));
+    },
+
+    verify: function (elements, fixtures) {
+        this.score = [this.verifiers[0].score, this.verifiers[1].score];
+
+        return this.verifiers[0].verify(elements, fixtures) || this.verifiers[1].verify(elements, fixtures);
+    },
+
+    toJSON: function () {
+        this.parameters = '[' + this.verifiers[0].toJSON() + ', ' + this.verifiers[1].toJSON() + ']';
+    }
+});
+
+
+/**
+ * Is always true.
+ * @param {Assessor.Verifier.Verifier} v
+ * @augments Assessor.Verifier.Verifier
+ * @constructor
+ */
+Assessor.Verifier.True = function (v) {
+    this['class'] = 'True';
+
+    /**
+     * The verifier that should not be verified.
+     * @type {Assessor.Verifier.Verifier}
+     */
+    this.verifier = v;
+};
+Assessor.Verifier.True.prototype = new Assessor.Verifier.Verifier;
+
+Assessor.extend(Assessor.Verifier.True.prototype, /** @lends Assessor.Verifier.True.prototype */ {
+    choose: function (elements, fixtures) {
+        this.score = this.verifier.score;
+        return this.verifier.choose(elements, fixtures);
+    },
+
+    verify: function (elements, fixtures) {
+        this.score = this.verifier.score;
+        return true;
+    },
+
+    toJSON: function () {
+        this.parameters = '[' + this.verifier.toJSON() + ']';
+    }
+});
+
+// endregion LOGICAL
+
 // region EXISTENCE
 /**
  * There exists a line and this line is defined by the two given points.
@@ -476,16 +550,21 @@ Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.L
     choose: function (elements, fixtures) {
         var new_fixtures = [], fix, i, j;
 
+        if (fixtures.get(this.line) && !(this.points[0] || this.points[1])) {
+            return [];
+        }
+
         for (i = 0; i < elements.lines.length; i++) {
-            fix = new Assessor.FixtureList(fixtures);
-            fix.set(this.line, elements.lines[i]);
-
             for (j = 0; j < 2; j++) {
-                fix.set(this.points[j], elements.lines[i]['point' + (j+1)]);
-            }
+                fix = new Assessor.FixtureList(fixtures);
+                fix.set(this.line, elements.lines[i]);
 
-            if (this.verify(elements, fix)) {
-                new_fixtures.push(fix);
+                fix.set(this.points[j], elements.lines[i].point1);
+                fix.set(this.points[(j + 1) % 2], elements.lines[i].point2);
+
+                if (this.verify(elements, fix)) {
+                    new_fixtures.push(fix);
+                }
             }
         }
 
@@ -493,17 +572,28 @@ Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.L
     },
 
     verify: function (elements, fixtures) {
-        var l = fixtures.get(this.line),
+        var res,
+            l = fixtures.get(this.line),
             A = fixtures.get(this.points[0]),
             B = fixtures.get(this.points[1]);
 
-        return l
-            && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1
-            && ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
+        res = l;
+
+        if (this.points[0] && this.points[1]) {
+            res = res && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1 &&
+                ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
+        }
+
+        return res;
     },
 
     toJSON: function () {
-        this.parameters = '["' + this.line + '", "' + this.points.join('", "') + '"]';
+        if (this.points[0] && this.points[1]) {
+            this.parameters = '["' + this.line + '", "' + this.points.join('", "') + '"]';
+        } else {
+            this.parameters = '["' + this.line + '"]';
+        }
+
         return Assessor.Base.prototype.toJSON.call(this);
     }
 });

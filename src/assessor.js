@@ -223,7 +223,7 @@ Assessor.extend(Assessor.FixtureList.prototype, /** @lends Assessor.FixtureList.
 
     /**
      * Remove fixtures.
-     * @params {Assessor.FixtureList} fl
+     * @param {Assessor.FixtureList} fl
      */
     remove: function (fl) {
         var i;
@@ -271,6 +271,8 @@ Assessor.Value = {};
 Assessor.Verifier.Verifier = function () {
     this.namespace = 'Verifier';
     this['class'] = "Verifier";
+
+    this.score = 0;
 };
 Assessor.Verifier.Verifier.prototype = new Assessor.Base;
 
@@ -335,18 +337,51 @@ Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.pr
     },
 
     /**
+     * Collect all valid fixtures, not just the first one.
+     * @param {JXG.Board} board
+     * @param {Array} success
+     */
+    collect: function (board, success) {
+        var e = new Assessor.ElementList(board);
+
+        this.fixtures.clear();
+
+        this.next(e, 0, success);
+
+        return success;
+    },
+
+    /**
      * Backtracking algorithm to verify an assessment. This method goes through all verifiers in
      * {@link Assessor.Assessment#constraints} and tries to map all <tt>elements</tt> to the correct
      * elements given by the author in the constraints such that all of the constraints are fulfilled.
      * @param {Assessor.ElementList} elements
      * @param {Number} i
+     * @param {Array} [success]
      * @return {Boolean}
      */
-    next: function (elements, i) {
-        var poss, constr, j, t;
+    next: function (elements, i, success) {
+        var poss, constr, j, t, score = [], fixes;
 
         if (i >= this.constraints.length) {
             Assessor.Utils.log('got a leaf!');
+
+            if (success) {
+                for (j = 0; j < this.constraints.length; j++) {
+                    score = score.concat(this.constraints[j].score);
+                }
+
+                fixes = this.fixtures.simplify();
+                fixes._score_ = score;
+                t = JXG.toJSON(fixes);
+
+                if (JXG.indexOf(success, t) === -1) {
+                    success.push(t);
+                }
+
+                return false;
+            }
+
             return true;
         }
 
@@ -364,7 +399,7 @@ Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.pr
 
             if (constr.verify(elements, this.fixtures)) {
                 Assessor.Utils.log('poss 0, verified, go next');
-                return this.next(elements, i + 1);
+                return this.next(elements, i + 1, success);
             } else {
                 Assessor.Utils.log('poss 0, not verified');
                 return false;
@@ -374,7 +409,7 @@ Assessor.extend(Assessor.Assessment.prototype, /** @lends Assessor.Assessment.pr
             for (j = 0; j < poss.length; j++) {
                 Assessor.Utils.log('fixating', this.fixtures.simplify());
                 this.fixtures['import'](poss[j]);
-                if (this.next(elements, i + 1)) {
+                if (this.next(elements, i + 1, success)) {
                     return true;
                 } else {
                     this.fixtures.remove(poss[j]);

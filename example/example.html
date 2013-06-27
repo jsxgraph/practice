@@ -13,13 +13,21 @@
     <title>practice examples</title>
     <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
     <script type="text/javascript" src="http://bin.sketchometry.com/js/jquery.js"></script>
-    <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/~michael/jsxgui/JSXGraph/src/loadjsxgraph.js"></script>
+    <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
     <script type="text/javascript" src="http://bin.sketchometry.com/js/dollarn.js"></script>
     <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/~michael/jsxgui/JSXGraph/src/reader/sketch.js"></script>
+    <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/~michael/jsxgui/JSXGraph/src/themes/gui.js"></script>
     <script type="text/javascript" src="http://bin.sketchometry.com/js/sketch.js"></script>
 
-    <script type="text/javascript" src="../src/practice.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.5/require.min.js"></script>
+    <script type="text/javascript">
+        requirejs.config({
+            //By default load any module IDs from js/lib
+            baseUrl: '../src'
+        });
+    </script>
 
+    <script type="text/javascript" src="../src/wrappers/jsxgraph.js"></script>
     <script type="text/javascript" src="common.js"></script>
 
     <style type="text/css">
@@ -47,229 +55,221 @@
 <script type="text/javascript">
     /* <![CDATA[ */
 
-    (function () {
+    require([
+        'control/assessment', 'control/instance', 'control/elementlist', 'verifier/base', 'value/base', 'utils/log',
+        'verifier/compare', 'verifier/element', 'verifier/geometric', 'verifier/logic',
+        'value/arithmetic', 'value/geometric'
+    ], function (Assessment, Instance, ElementList, Verifier, Value, Log) {
+        var i, conf;
 
-        if (typeof console === 'undefined' || !console.log) {
-            console = {
-                log: function () {}
-            }
+        if (typeof console === 'object') {
+            console.log = console.$log;
         }
+        Assessor.init();
 
-        window.onload = function () {
-            var i;
-            Assessor.init();
-
-            /*a = GUI.board.create('point', [-5, 0]);
-            b = GUI.board.create('point', [-3, 0]);
-            c = GUI.board.create('point', [-1.5, 2.2]);
-            d = GUI.board.create('point', [1, 0]);
-            e = GUI.board.create('point', [-0.3, 4.1]);
-
-            GUI.board.create('angle', [c, b, a]);
-            GUI.board.create('angle', [d, b, e]);*/
-
-            $('#measure').on('click', function (e) {
-                var points = window.prompt('Input points you want to measure e.g. "AB" to measure distance AB or "ABC" to measure angle ABC (counterclockwise)', 'ABC'),
-                    pts = points.split(''),
-                    i, a;
-
-                if (pts.length === 3) {
-                    a = GUI.board.create('angle', pts);
-                    a.label.content.setText(function () {
-                        return JXG.autoDigits(a.Value()/Math.PI*180);
-                    });
-                }
-            });
-
-            $('#check').on('click', function (e_) {
-                var i, ok = true;
-
-                $('#log').html('');
-                Assessor.Utils.logs.length = 0;
-                $('#log').append('verifying problem "' + conf[$('#problem').val()].name + '".<br />');
-                ok = conf[$('#problem').val()].constraints.verify(GUI.board);
-
-                $('#log').append('<strong>Result: ' + (ok ? 'CORRECT' : 'WRONG') + '</strong><br />');
-                $('#log').append('Fixtures:<br />');
-
-                for (i in conf[$('#problem').val()].constraints.fixtures.list) {
-                    $('#log').append(i + ' -> ' + conf[$('#problem').val()].constraints.fixtures.list[i].name + '<br />');
-                }
-
-                $('#log').append('---<br/>');
-            });
-
-            for (i in conf) {
-                $('#problem').append('<option value="' + i + '">' + conf[i].name + '</option>');
-                $('#task').html(conf[$('#problem').val()].task);
-            }
-
-            $('#problem').on('change', function (e) {
-                $('#task').html(conf[$('#problem').val()].task);
-            });
-        };
-
-        var conf = {
+        conf = {
             point: {
                 name: 'Point',
                 task: 'Place a point at (2, 3)',
-                constraints: new Assessor.Assessment(
-                    new Assessor.Verifier.Equals(
-                        new Assessor.Value.NumberElements('points'), 1
-                    ),
-                    new Assessor.Verifier.Between(
-                        new Assessor.Value.XY('A', 'X'), 1.9, 2.1
-                    ),
-                    new Assessor.Verifier.Between(
-                        new Assessor.Value.XY('A', 'Y'), 2.9, 3.1
-                    )
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 1
+                        ),
+                        new Verifier.Between(
+                                new Value.XY('A', 'X'), 1.9, 2.1
+                        ),
+                        new Verifier.Between(
+                                new Value.XY('A', 'Y'), 2.9, 3.1
+                        )
                 )
             },
             line: {
                 name: 'Line',
                 task: 'Draw two points and put a line through them',
-                constraints: new Assessor.Assessment(
-                    new Assessor.Verifier.Equals(
-                        new Assessor.Value.NumberElements('points'), 2
-                    ),
-                    new Assessor.Verifier.Equals(
-                        new Assessor.Value.NumberElements('lines'), 1
-                    ),
-                    new Assessor.Verifier.Line('l', 'P', 'Q')
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 2
+                        ),
+                        new Verifier.Equals(
+                                new Value.NumberElements('lines'), 1
+                        ),
+                        new Verifier.Line('l', 'P', 'Q')
                 )
             },
             collinear: {
                 name: "Collinear",
                 task: "Place three collinear points.",
-                constraints: new Assessor.Assessment(
-                    new Assessor.Verifier.Collinear('A', 'B', 'C'),
-                    new Assessor.Verifier.Equals(
-                        new Assessor.Value.NumberElements('points'), 3
-                    )
+                constraints: new Assessment(
+                        new Verifier.Collinear('A', 'B', 'C'),
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 3
+                        )
                 )},
-                supplementary: {
-                    name: 'Supplementary angles',
-                    task: 'Create an angle with a measure of 120 &deg; and its supplementary angle.',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Angle('alpha', 'A', 'B', 'C'),
-                        new Assessor.Verifier.Angle('beta', 'D', 'E', 'F'),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle('alpha'), 115, 125
+            supplementary: {
+                name: 'Supplementary angles',
+                task: 'Create an angle with a measure of 120 &deg; and its supplementary angle.',
+                constraints: new Assessment(
+                        new Verifier.Angle('alpha', 'A', 'B', 'C'),
+                        new Verifier.Angle('beta', 'D', 'E', 'F'),
+                        new Verifier.Between(
+                                new Value.Angle('alpha'), 115, 125
                         ),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle('beta'), 55, 65
+                        new Verifier.Between(
+                                new Value.Angle('beta'), 55, 65
                         )
-                    )
-                },
-                linearpair: {
-                    name: 'Linear pair',
-                    task: 'Create line pair with one angle measuring 120 &deg;.',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('angles'), 2
+                )
+            },
+            linearpair: {
+                name: 'Linear pair',
+                task: 'Create line pair with one angle measuring 120 &deg;.',
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('angles'), 2
                         ),
-                        new Assessor.Verifier.LEQ(
-                            new Assessor.Value.NumberElements('points'), 5
+                        new Verifier.LEQ(
+                                new Value.NumberElements('points'), 5
                         ),
-                        new Assessor.Verifier.Angle('alpha', 'C', 'B', 'A'),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle('alpha'), 115, 125
+                        new Verifier.Angle('alpha', 'C', 'B', 'A'),
+                        new Verifier.Between(
+                                new Value.Angle('alpha'), 115, 125
                         ),
-                        new Assessor.Verifier.Angle('beta', 'D', 'B', 'E'),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle('beta'), 55, 65
+                        new Verifier.Angle('beta', 'D', 'B', 'E'),
+                        new Verifier.Between(
+                                new Value.Angle('beta'), 55, 65
                         ),
-                        new Assessor.Verifier.Collinear('A', 'B', 'D'),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle3P('E', 'B', 'A'), 115, 125
+                        new Verifier.Collinear('A', 'B', 'D'),
+                        new Verifier.Between(
+                                new Value.Angle3P('E', 'B', 'A'), 115, 125
                         ),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle3P('D', 'B', 'C'), 55, 65
+                        new Verifier.Between(
+                                new Value.Angle3P('D', 'B', 'C'), 55, 65
                         )
-                    )
-                },
-                acute: {
-                    name: 'Acute angle',
-                    task: 'Draw an acute angle',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('angles'), 1
+                )
+            },
+            acute: {
+                name: 'Acute angle',
+                task: 'Draw an acute angle',
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('angles'), 1
                         ),
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('points'), 3
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 3
                         ),
-                        new Assessor.Verifier.Angle('alpha', 'A', 'B', 'C'),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle('alpha'), 0, 90
+                        new Verifier.Angle('alpha', 'A', 'B', 'C'),
+                        new Verifier.Between(
+                                new Value.Angle('alpha'), 0, 90
                         )
-                    )
-                },
-                rightangle: {
-                    name: 'Right angle',
-                    task: 'Draw a right angle',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('angles'), 1
+                )
+            },
+            rightangle: {
+                name: 'Right angle',
+                task: 'Draw a right angle',
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('angles'), 1
                         ),
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('points'), 3
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 3
                         ),
-                        new Assessor.Verifier.Angle('alpha', 'A', 'B', 'C'),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle('alpha'), 85, 95
+                        new Verifier.Angle('alpha', 'A', 'B', 'C'),
+                        new Verifier.Between(
+                                new Value.Angle('alpha'), 85, 95
                         )
-                    )
-                },
-                bisector: {
-                    name: 'Bisector point',
-                    task: 'Place three points such that one of them bisects the segment between the other two.',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('points'), 3
+                )
+            },
+            bisector: {
+                name: 'Bisector point',
+                task: 'Place three points such that one of them bisects the segment between the other two.',
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 3
                         ),
-                        new Assessor.Verifier.Collinear('A', 'B', 'C'),
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.Distance('A', 'B'),
-                            new Assessor.Value.Distance('B', 'C'),
-                            0.5
+                        new Verifier.Collinear('A', 'B', 'C'),
+                        new Verifier.Equals(
+                                new Value.Distance('A', 'B'),
+                                new Value.Distance('B', 'C'),
+                                0.5
                         )
-                    )
-                },
-                righttriangle: {
-                    name: 'Right triangle',
-                    task: 'Draw a right triangle',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('points'), 3
+                )
+            },
+            righttriangle: {
+                name: 'Right triangle',
+                task: 'Draw a right triangle',
+                constraints: new Assessment(
+                        new Verifier.Equals(
+                                new Value.NumberElements('points'), 3
                         ),
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.NumberElements('polygons'), 1
+                        new Verifier.Equals(
+                                new Value.NumberElements('polygons'), 1
                         ),
-                        new Assessor.Verifier.Polygon('p', 'A', 'B', 'C'),
-                        new Assessor.Verifier.Equals(
-                            new Assessor.Value.Vertices('p'), 3
+                        new Verifier.Polygon('p', 'A', 'B', 'C'),
+                        new Verifier.Equals(
+                                new Value.Vertices('p'), 3
                         ),
-                        new Assessor.Verifier.Between(
-                            new Assessor.Value.Angle3P('D', 'E', 'F'), 87, 93
+                        new Verifier.Between(
+                                new Value.Angle3P('D', 'E', 'F'), 87, 93
                         )
-                    )
-                },
-                notthreepoints: {
-                    name: 'Not three points',
-                    task: 'Draw anything as long as it does not contain three points.',
-                    constraints: new Assessor.Assessment(
-                        new Assessor.Verifier.Not(
-                            new Assessor.Verifier.Equals(
-                                new Assessor.Value.NumberElements('points'), 3
-                            )
+                )
+            },
+            notthreepoints: {
+                name: 'Not three points',
+                task: 'Draw anything as long as it does not contain three points.',
+                constraints: new Assessment(
+                        new Verifier.Not(
+                                new Verifier.Equals(
+                                        new Value.NumberElements('points'), 3
+                                )
                         )
-                    )
-                }
-            };
+                )
+            }
+        };
 
         window.conf = conf;
-    })();
 
+        $('#measure').on('click', function (e) {
+            var points = window.prompt('Input points you want to measure e.g. "AB" to measure distance AB or "ABC" to measure angle ABC (counterclockwise)', 'ABC'),
+                    pts = points.split(''),
+                    i, a;
+
+            if (pts.length === 3) {
+                a = GUI.board.create('angle', pts);
+                a.label.content.setText(function () {
+                    return JXG.autoDigits(a.Value()/Math.PI*180);
+                });
+            }
+        });
+
+        $('#check').on('click', function (e_) {
+            var i, el, ok = true;
+
+            $('#log').html('');
+            Log.clear();
+
+            el = new ElementList(GUI.board);
+
+            $('#log').append('verifying problem "' + conf[$('#problem').val()].name + '".<br />');
+            ok = conf[$('#problem').val()].constraints.verify(el);
+
+            $('#log').append('<strong>Result: ' + (ok ? 'CORRECT' : 'WRONG') + '</strong><br />');
+            $('#log').append('Fixtures:<br />');
+
+            for (i in conf[$('#problem').val()].constraints.fixtures.list) {
+                $('#log').append(i + ' -> ' + conf[$('#problem').val()].constraints.fixtures.list[i].name + '<br />');
+            }
+
+            $('#log').append('---<br/>');
+        });
+
+        for (i in conf) {
+            $('#problem').append('<option value="' + i + '">' + conf[i].name + '</option>');
+            $('#task').html(conf[$('#problem').val()].task);
+        }
+
+        $('#problem').on('change', function (e) {
+            $('#task').html(conf[$('#problem').val()].task);
+        });
+    });
     /* ]]> */
 </script>
 </body>

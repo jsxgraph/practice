@@ -1,37 +1,36 @@
 /*
     practice - JSXGraph practice and assessment framework
 
-    Copyright 2012
+    Copyright 2012 - 2013
         Michael Gerhäuser
 
     Licensed under the LGPL v3
 */
 
-/*jslint nomen:true, plusplus:true*/
-/*global JXG:true, Assessor:true*/
+/*jslint nomen: true, plusplus: true*/
+/*global define: true*/
 
-(function (global) {
+define(['verifier/base', 'jsxgraph', 'utils/obj', 'utils/log'], function (Verifier, JXG, obj, Log) {
 
     "use strict";
+
+    var Point, Line, Angle, Polygon;
 
     /**
      * There exists a line and this line is defined by the two given points.
      * @param {String} A Point
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Point = function (A) {
-        this['class'] = 'Point';
-
+    Point = function Point(A) {
         /**
          * The points defining the line
          * @type {Array}
          */
         this.point = A;
     };
-    Assessor.Verifier.Point.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Point.prototype, /** @lends Assessor.Verifier.Point.prototype */{
+    obj.inherit(Verifier.Verifier, Point, /** @lends Point.prototype */{
         choose: function (elements, fixtures) {
             var new_fixtures = [], fix, i, j;
 
@@ -40,7 +39,7 @@
             }
 
             for (i = 0; i < elements.points.length; i++) {
-                fix = new Assessor.FixtureList(fixtures);
+                fix = fixtures.fork();
                 fix.set(this.point, elements.points[i]);
                 if (this.verify(elements, fix)) {
                     new_fixtures.push(fix);
@@ -57,27 +56,18 @@
             res = p && (p.elementClass === JXG.OBJECT_CLASS_POINT);
 
             return res;
-        },
-
-        toJSON: function () {
-            this.parameters = '["' + this.point + '"]';
-
-            return Assessor.Base.prototype.toJSON.call(this);
         }
     });
-
 
     /**
      * There exists a line and this line is defined by the two given points.
      * @param {String} l Line
      * @param {String} A Point
      * @param {String} B Point
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Line = function (l, A, B) {
-        this['class'] = 'Line';
-
+    Line = function Line(l, A, B) {
         /**
          * Store the identifier of the line.
          * @type {String}
@@ -90,9 +80,8 @@
          */
         this.points = [A, B];
     };
-    Assessor.Verifier.Line.prototype = new Assessor.Verifier.Verifier;
 
-    Assessor.extend(Assessor.Verifier.Line.prototype, /** @lends Assessor.Verifier.Line.prototype */{
+    obj.inherit(Verifier.Verifier, Line, /** @lends Line.prototype */{
         choose: function (elements, fixtures) {
             var new_fixtures = [], fix, i, j;
 
@@ -102,7 +91,7 @@
 
             for (i = 0; i < elements.lines.length; i++) {
                 for (j = 0; j < 2; j++) {
-                    fix = new Assessor.FixtureList(fixtures);
+                    fix = fixtures.fork();
                     fix.set(this.line, elements.lines[i]);
 
                     fix.set(this.points[j], elements.lines[i].point1);
@@ -126,21 +115,11 @@
             res = l && (l.elementClass === JXG.OBJECT_CLASS_LINE);
 
             if (this.points[0] && this.points[1]) {
-                res = res && Assessor.JXG.indexOf(elements.points, l.point1) > -1 && Assessor.JXG.indexOf(elements.points, l.point2) > -1 &&
+                res = res && JXG.indexOf(elements.points, l.point1) > -1 && JXG.indexOf(elements.points, l.point2) > -1 &&
                     ((l.point1 === A && l.point2 === B) || (l.point1 === B && l.point2 === A));
             }
 
             return res;
-        },
-
-        toJSON: function () {
-            if (this.points[0] && this.points[1]) {
-                this.parameters = '["' + this.line + '", "' + this.points.join('", "') + '"]';
-            } else {
-                this.parameters = '["' + this.line + '"]';
-            }
-
-            return Assessor.Base.prototype.toJSON.call(this);
         }
     });
 
@@ -151,17 +130,15 @@
      * @param {String} A
      * @param {String} B
      * @param {String} C
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Angle = function (alpha, A, B, C) {
-        this['class'] = 'Angle';
+    Angle = function Angle(alpha, A, B, C) {
         this.name = alpha;
         this.points = [A, B, C];
     };
-    Assessor.Verifier.Angle.prototype = new Assessor.Verifier.Verifier;
 
-    Assessor.extend(Assessor.Verifier.Angle.prototype, /** @lends Assessor.Verifier.Angle.prototype */ {
+    obj.inherit(Verifier.Verifier, Angle, /** @lends Angle.prototype */ {
         choose: function (elements, fixtures) {
             var i, j, a, fix, new_fixtures = [];
 
@@ -169,13 +146,13 @@
             for (i = 0; i < elements.angles.length; i++) {
                 a = elements.angles[i];
 
-                Assessor.Utils.log('checking out angle', a.name, 'with value', a.Value()*180/Math.PI);
+                Log.log('checking out angle', a.name, 'with value', a.Value() * 180 / Math.PI);
 
-                fix = new Assessor.FixtureList(fixtures);
+                fix = fixtures.fork();
                 fix.set(this.name, a);
 
                 for (j = 0; j < 3; j++) {
-                    fix.set(this.points[j], Assessor.JXG.getRef(a.board, a.parents[j]));
+                    fix.set(this.points[j], a.board.select(a.parents[j]));
                 }
 
                 if (this.verify(elements, fix)) {
@@ -199,20 +176,15 @@
 
             for (i = 0; i < 3; i++) {
                 // check if the dependencies and the fixtures work out
-                p[i] = p[i] || Assessor.JXG.getRef(a.board, a.parents[i]);
+                p[i] = p[i] || a.board.select(a.parents[i]);
                 if (p[i].id !== a.parents[i]) {
                     // nah, point (i+1) is already set but doesn't match with what it is set to
-                    Assessor.Utils.log('point', i + 1, 'is wrong');
+                    Log.log('point', i + 1, 'is wrong');
                     return false;
                 }
             }
 
             return true;
-        },
-
-        toJSON: function () {
-            this.parameters = '["' + this.name + '", "' + this.points.join('", "') + '"]';
-            return Assessor.Base.prototype.toJSON.call(this);
         }
     });
 
@@ -220,12 +192,10 @@
      * Assume the existence of a polygon defined by the given points.
      * @param {String} p
      * @param {String} A|B|C|... Arbitrary number of points
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Polygon = function (p, A) {
-        this['class'] = 'Polygon';
-
+    Polygon = function Polygon(p, A) {
         /**
          * A polygon.
          * @type {String}
@@ -238,9 +208,8 @@
          */
         this.points = Array.prototype.slice.call(arguments, 1);
     };
-    Assessor.Verifier.Polygon.prototype = new Assessor.Verifier.Verifier;
 
-    Assessor.extend(Assessor.Verifier.Polygon.prototype, {
+    obj.inherit(Verifier.Verifier, Polygon, /** @lends Polygon.prototype */ {
         choose: function (elements, fixtures) {
             var i, j, p, fix, new_fixtures = [];
 
@@ -248,20 +217,18 @@
             for (i = 0; i < elements.polygons.length; i++) {
                 p = elements.polygons[i];
 
-                if (this.points.length !== p.vertices.length - 1) {
-                    continue;
-                }
+                if (this.points.length === p.vertices.length - 1) {
+                    Log.log('checking out polygon', p.name);
 
-                Assessor.Utils.log('checking out polygon', p.name);
+                    fix = fixtures.fork();
+                    fix.set(this.polygon, p);
+                    for (j = 0; j < this.points.length; j++) {
+                        fix.set(this.points[j], p.board.select(p.vertices[j]));
+                    }
 
-                fix = new Assessor.FixtureList(fixtures);
-                fix.set(this.polygon, p);
-                for (j = 0; j < this.points.length; j++) {
-                    fix.set(this.points[j], Assessor.JXG.getRef(p.board, p.vertices[j]));
-                }
-
-                if (this.verify(elements, fix)) {
-                    new_fixtures.push(fix);
+                    if (this.verify(elements, fix)) {
+                        new_fixtures.push(fix);
+                    }
                 }
             }
 
@@ -274,7 +241,7 @@
                 i;
 
             if (!a || a.vertices.length - 1 !== this.points.length) {
-                Assessor.Utils.log('polygon undefined or vertices length doesn\'t match', a);
+                Log.log('polygon undefined or vertices length doesn\'t match', a);
                 return false;
             }
 
@@ -287,17 +254,21 @@
                 p[i] = p[i] || a.vertices[i];
                 if (p[i].id !== a.vertices[i].id) {
                     // nah, point (i+1) is already set but doesn't match with what it is set to
-                    Assessor.Utils.log('point', i + 1, 'is wrong');
+                    Log.log('point', i + 1, 'is wrong');
                     return false;
                 }
             }
 
             return true;
-        },
-
-        toJSON: function () {
-            this.parameters = '["' + this.polygon + '", "' + this.points.join('", "') + '"]';
-            return Assessor.Base.prototype.toJSON.call(this);
         }
     });
-}(this));
+
+    obj.extend(Verifier, {
+        Point: Point,
+        Line: Line,
+        Angle: Angle,
+        Polygon: Polygon
+    });
+
+    return Verifier;
+});

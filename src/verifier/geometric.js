@@ -1,39 +1,38 @@
 /*
     practice - JSXGraph practice and assessment framework
 
-    Copyright 2012
+    Copyright 2012 - 2013
         Michael Gerhäuser
 
     Licensed under the LGPL v3
 */
 
-/*jslint nomen:true, plusplus:true*/
-/*global JXG:true, Assessor:true*/
+/*jslint nomen: true, plusplus: true*/
+/*global define: true*/
 
-(function (global) {
+define(['verifier/base', 'jsxgraph', 'utils/obj', 'utils/log'], function (Verifier, JXG, obj, Log) {
 
     "use strict";
+
+    var Collinear;
 
     /**
      * Checks if three given points are collinear.
      * @param {String} A
      * @param {String} B
      * @param {String} C
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Collinear = function (A, B, C) {
-        this['class'] = "Collinear";
-
+    Collinear = function Collinear(A, B, C) {
         /**
          * Stores the collinear points.
          * @type {Array}
          */
         this.points = [A, B, C];
     };
-    Assessor.Verifier.Collinear.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Collinear.prototype, /** @lends Assessor.Verifier.Collinear.prototype */ {
+    obj.inherit(Verifier.Verifier, Collinear, /** @lends Collinear.prototype */ {
         choose: function (elements, fixtures) {
             var i, j, k, fix, new_fixtures = [];
 
@@ -43,31 +42,31 @@
                     this.points.push.apply(this.points, this.points.splice(i, 1));
                 }
             }
-            Assessor.Utils.log('number of points', elements.points.length);
+            Log.log('number of points', elements.points.length);
             // find all valid combinations depending on previous fixtures
 
             // all points fixed -> nothing to do
             if (fixtures[this.points[0]]) {
-                Assessor.Utils.log('point1 fixed');
+                Log.log('point1 fixed');
                 return [];
             }
 
-            Assessor.Utils.log('point 1 not fixed yet');
+            Log.log('point 1 not fixed yet');
             for (i = 0; i < elements.points.length; i++) {
                 if (fixtures.get(this.points[1])) {
-                    Assessor.Utils.log('point2 fixed');
-                    fix = new Assessor.FixtureList(fixtures);
+                    Log.log('point2 fixed');
+                    fix = fixtures.fork();
                     fix.set(this.points[0], elements.points[i]);
 
                     if (this.verify(elements, fix)) {
                         new_fixtures.push(fix);
                     }
                 } else {
-                    Assessor.Utils.log('point 2 not fixed yet');
+                    Log.log('point 2 not fixed yet');
                     for (j = 0; j < elements.points.length; j++) {
                         if (fixtures.get(this.points[2])) {
-                            Assessor.Utils.log('point3 fixed');
-                            fix = new Assessor.FixtureList(fixtures);
+                            Log.log('point3 fixed');
+                            fix = fixtures.fork();
                             fix.set(this.points[0], elements.points[i]);
                             fix.set(this.points[1], elements.points[j]);
 
@@ -75,9 +74,9 @@
                                 new_fixtures.push(fix);
                             }
                         } else {
-                            Assessor.Utils.log('point 3 not fixed');
+                            Log.log('point 3 not fixed');
                             for (k = 0; k < elements.points.length; k++) {
-                                fix = new Assessor.FixtureList(fixtures);
+                                fix = fixtures.fork();
                                 fix.set(this.points[0], elements.points[i]);
                                 fix.set(this.points[1], elements.points[j]);
                                 fix.set(this.points[2], elements.points[k]);
@@ -97,7 +96,7 @@
         verify: function (elements, fixtures) {
             var A, B, C, res, proj, line;
 
-            Assessor.Utils.log('collinear verifiy called');
+            Log.log('collinear verifiy called');
             if (this.points.length < 3) {
                 return false;
             }
@@ -113,25 +112,24 @@
             }
 
             if (res) {
-                Assessor.Utils.log('lets test', A.name, B.name, C.name, ' for collinearity...');
-                line = Assessor.JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
-                proj = Assessor.JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
+                Log.log('lets test', A.name, B.name, C.name, ' for collinearity...');
+                line = JXG.Math.crossProduct(A.coords.usrCoords, B.coords.usrCoords);
+                proj = JXG.Math.Geometry.projectPointToLine(C, {stdform: line});
 
-                this.score = Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1)) / A.Dist(B);
+                this.score = JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1)) / A.Dist(B);
 
-                res =  Assessor.JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1)) / A.Dist(B) < 0.07;
+                res =  JXG.Math.Geometry.distance(proj.usrCoords.slice(1), C.coords.usrCoords.slice(1)) / A.Dist(B) < 0.07;
 
                 if (res) {
-                    Assessor.Utils.log('collinear: ', A.name, B.name, C.name);
+                    Log.log('collinear: ', A.name, B.name, C.name);
                 }
             }
 
             return res;
-        },
-
-        toJSON: function () {
-            this.parameters = '["' + this.points.join('", "') + '"]';
-            return Assessor.Base.prototype.toJSON.call(this);
         }
     });
-}(this));
+
+    Verifier.Collinear = Collinear;
+
+    return Verifier;
+});

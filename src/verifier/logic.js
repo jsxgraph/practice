@@ -1,36 +1,35 @@
 /*
     practice - JSXGraph practice and assessment framework
 
-    Copyright 2012
+    Copyright 2012 - 2013
         Michael Gerhäuser
 
     Licensed under the LGPL v3
 */
 
-/*jslint nomen:true, plusplus:true*/
-/*global JXG:true, Assessor:true*/
+/*jslint nomen: true, plusplus: true*/
+/*global define: true*/
 
-(function (global) {
+define(['verifier/base', 'utils/obj', 'utils/log'], function (Verifier, obj, Log) {
 
     "use strict";
 
+    var Or, And, True, Not;
+
     /** * Verifies the one of the given verifier verifies.
      * @param {Array} v
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Or = function (v) {
-        this['class'] = 'Or';
-
+    Or = function Or(v) {
         /**
          * The verifier that should not be verified.
-         * @type {Assessor.Verifier.Verifier}
+         * @type {Verifier.Verifier}
          */
         this.verifiers = v;
     };
-    Assessor.Verifier.Or.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Or.prototype, /** @lends Assessor.Verifier.Or.prototype */ {
+    obj.inherit(Verifier.Verifier, Or, /** @lends Or.prototype */ {
         choose: function (elements, fixtures) {
             var i,
                 fix = [],
@@ -60,37 +59,24 @@
             }
 
             return result;
-        },
-
-        toJSON: function () {
-            var i;
-
-            this.parameters = [];
-            for (i = 0; i < this.verifiers.length; i++) {
-                this.parameters.push(this.verifiers[i].toJSON());
-            }
-            this.parameters = '[[' + this.parameters.join(', ') + ']]';
         }
     });
 
 
     /** * Verifies that all of the given verifier verify.
      * @param {Array} v
-     * @augments Assessor.Verifier.Verifier
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.And = function (v) {
-        this['class'] = 'And';
-
+    And = function And(v) {
         /**
          * The verifier that should not be verified.
-         * @type {Assessor.Verifier.Verifier}
+         * @type {Verifier.Verifier}
          */
         this.verifiers = v;
     };
-    Assessor.Verifier.And.prototype = new Assessor.Verifier.Or();
 
-    Assessor.extend(Assessor.Verifier.And.prototype, /** @lends Assessor.Verifier.And.prototype */ {
+    obj.inherit(Verifier.Verifier, And, /** @lends And.prototype */ {
         verify: function (elements, fixtures) {
             var i,
                 result = true;
@@ -106,24 +92,21 @@
     });
 
 
-    /**
+    /**Verifier
      * Is always true.
-     * @param {Assessor.Verifier.Verifier} v
-     * @augments Assessor.Verifier.Verifier
+     * @param {Verifier.Verifier} v
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.True = function (v) {
-        this['class'] = 'True';
-
+    True = function True(v) {
         /**
          * The verifier that should not be verified.
-         * @type {Assessor.Verifier.Verifier}
+         * @type {Verifier.Verifier}
          */
         this.verifier = v;
     };
-    Assessor.Verifier.True.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.True.prototype, /** @lends Assessor.Verifier.True.prototype */ {
+    obj.inherit(Verifier.Verifier, True, /** @lends True.prototype */ {
         choose: function (elements, fixtures) {
             this.score = this.verifier.score;
             return this.verifier.choose(elements, fixtures);
@@ -141,36 +124,37 @@
         }
     });
 
-    Assessor.Verifier.Optional = Assessor.Verifier.True;
-
     /**
      * Verifies only of the given verifier does NOT verify.
-     * @param {Assessor.Verifier.Verifier} v
-     * @augments Assessor.Verifier.Verifier
+     * @param {Verifier.Verifier} v
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Not = function (v) {
-        this['class'] = 'Not';
-
+    Not = function Not(v) {
         /**
          * The verifier that should not be verified.
-         * @type {Assessor.Verifier.Verifier}
+         * @type {Verifier.Verifier}
          */
         this.verifier = v;
     };
-    Assessor.Verifier.Not.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Not.prototype, /** @lends Assessor.Verifier.Not.prototype */ {
+    obj.inherit(Verifier.Verifier, Not, /** @lends Not.prototype */ {
         choose: function (elements, fixtures) {
             return this.verifier.choose(elements, fixtures);
         },
 
         verify: function (elements, fixtures) {
             return !this.verifier.verify(elements, fixtures);
-        },
-
-        toJSON: function () {
-            this.parameters = '[' + this.verifier.toJSON() + ']';
         }
     });
-}(this));
+
+    obj.extend(Verifier, {
+        And: And,
+        True: True,
+        Optional: True,
+        Or: Or,
+        Not: Not
+    });
+
+    return Verifier;
+});

@@ -11,7 +11,7 @@
  * @fileoverview Helper functions for the practice examples in the example folder
  */
 
-
+var Assessor = {};
 JXG.extend(Assessor, {
     initsketch: function () {
         if (typeof GUI !== 'undefined') {

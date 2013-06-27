@@ -1,52 +1,51 @@
 /*
     practice - JSXGraph practice and assessment framework
 
-    Copyright 2012
+    Copyright 2012 - 2013
         Michael Gerhäuser
 
     Licensed under the LGPL v3
 */
 
-/*jslint nomen:true, plusplus:true*/
-/*global JXG:true, Assessor:true*/
+/*jslint nomen: true, plusplus: true*/
+/*global define: true*/
 
-(function (global) {
+define(['verifier/base', 'value/base', 'config', 'utils/obj', 'utils/log'], function (Verifier, Value, CONF, obj, Log) {
 
     "use strict";
+
+    var Between, Binary, Equals, Less, LEQ, Greater, GEQ, Score;
 
     /**
      * The value <tt>value</tt> has to be greater than or equal to <tt>min</tt> and lesser than
      * or equal to <tt>max</tt>.
-     * @param {Number|Assessor.Value.Value} value
-     * @param {Number|Assessor.Value.Value} min
-     * @param {Number|Assessor.Value.Value} max
-     * @augments Assessor.Verifier.Verifier
+     * @param {Number|Value} value
+     * @param {Number|Value} min
+     * @param {Number|Value} max
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Between = function (value, min, max) {
-        this['class'] = 'Between';
+    Between = function Between(value, min, max) {
+        /**
+         * The value that is to be compared to {@link Between#min} and {@link Between#max}.
+         * @type {Value}
+         */
+        this.value = Value.Value.expandNumber(value);
 
         /**
-         * The value that is to be compared to {@link Assessor.Verifier.Between#min} and {@link Assessor.Verifier.Between#max}.
-         * @type {Assessor.Value}
+         * The lower bound for {@link Between#value}.
+         * @type {Value}
          */
-        this.value = Assessor.Utils.expandNumber(value);
+        this.min = Value.Value.expandNumber(min);
 
         /**
-         * The lower bound for {@link Assessor.Verifier.Between#value}.
-         * @type {Assessor.Value}
+         * The upper bound for {@link Between#value}.
+         * @type {Value}
          */
-        this.min = Assessor.Utils.expandNumber(min);
-
-        /**
-         * The upper bound for {@link Assessor.Verifier.Between#value}.
-         * @type {Assessor.Value}
-         */
-        this.max = Assessor.Utils.expandNumber(max);
+        this.max = Value.Value.expandNumber(max);
     };
-    Assessor.Verifier.Between.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Between.prototype, /** @lends Assessor.Verifier.Between.prototype */ {
+    obj.inherit(Verifier.Verifier, Between, /** @lends Between.prototype */ {
         choose: function (elements, fixtures) {
             var miposs, maposs, i, j, k,
                 vposs = this.value.choose(elements, fixtures),
@@ -80,41 +79,34 @@
                 min = this.min.evaluate(elements, fixtures),
                 max = this.max.evaluate(elements, fixtures);
 
-            return min <= v && v <= max;
-        },
+            Log.log('verify between', min, max, v, v instanceof Value.Value);
 
-        toJSON: function () {
-            this.parameters = '[' + this.value.toJSON() + ', ' + this.min.toJSON() + ', ' + this.max.toJSON() + ']';
-            return Assessor.Base.prototype.toJSON.call(this);
+            return min <= v && v <= max;
         }
     });
 
     /**
-     * Base class for binary operators like {@link Assessor.Verifier.Equals} and
-     * {@link Assessor.Verifier.Less}.
-     * @param {Number|Assessor.Value.Value} lhs
-     * @param {Number|Assessor.Value.Value} rhs
-     * @augments Assessor.Verifier.Verifier
+     * Base class for binary operators like {@link Equals} and {@link Less}.
+     * @param {Number|Value} lhs
+     * @param {Number|Value} rhs
+     * @augments Verifier.Verifier
      * @constructor
      */
-    Assessor.Verifier.Binary = function (lhs, rhs) {
-        this['class'] = 'Binary';
-
+    Binary = function Binary(lhs, rhs) {
         /**
          * Left hand side of the equation.
-         * @type {Assessor.Value}
+         * @type {Value}
          */
-        this.lhs = Assessor.Utils.expandNumber(lhs);
+        this.lhs = Value.Value.expandNumber(lhs);
 
         /**
          * Right hand side of the equation.
-         * @type {Assessor.Value}
+         * @type {Value}
          */
-        this.rhs = Assessor.Utils.expandNumber(rhs);
+        this.rhs = Value.Value.expandNumber(rhs);
     };
-    Assessor.Verifier.Binary.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Binary.prototype, /** @lends Assessor.Verifier.Binary.prototype */ {
+    obj.inherit(Verifier.Verifier, Binary, /** @lends Binary.prototype */ {
         choose: function (elements, fixtures) {
             var rposs, i, j,
                 lposs = this.lhs.choose(elements, fixtures),
@@ -135,65 +127,52 @@
             }
 
             return new_fixtures;
-        },
-
-        toJSON: function () {
-            this.parameters = '[' + this.lhs.toJSON() + ', ' + this.rhs.toJSON() + ']';
-            return Assessor.Base.prototype.toJSON.call(this);
         }
     });
 
     /**
      * Compares two values and is valid only if those are equal or within a certain acceptance
      * range defined by <tt>eps</tt>.
-     * @param {Number|Assessor.Value.Value} lhs
-     * @param {Number|Assessor.Value.Value} rhs
-     * @param {Number} [eps=1e-5]
-     * @augments Assessor.Verifier.Binary
+     * @param {Number|Value} lhs
+     * @param {Number|Value} rhs
+     * @param {Number} [eps=CONF#eps]
+     * @augments Binary
      * @constructor
      */
-    Assessor.Verifier.Equals = function (lhs, rhs, eps) {
-        Assessor.Verifier.Binary.call(this, lhs, rhs);
-        this['class'] = 'Equals';
+    Equals = function Equals(lhs, rhs, eps) {
+        Equals.base.constructor.call(this, lhs, rhs);
 
         /**
-         * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
-         * and {@link Assessor.Verifier.Equals#rhs}.
+         * Allow a small difference when comparing {@link Equals#lhs} and {@link Equals#rhs}.
          * @type {Number}
          */
-        this.eps = eps || 1e-5;
+        this.eps = eps || CONF.eps;
     };
-    Assessor.Verifier.Equals.prototype = new Assessor.Verifier.Binary();
 
-    Assessor.extend(Assessor.Verifier.Equals.prototype, /** @lends Assessor.Verifier.Equals.prototype */ {
+    obj.inherit(Binary, Equals, /** @lends Equals.prototype */ {
         verify: function (elements, fixtures) {
             var lhs = this.lhs.evaluate(elements, fixtures),
                 rhs = this.rhs.evaluate(elements, fixtures);
 
-            return Math.abs(lhs - rhs) <= this.eps;
-        },
+            Log.log('verify equals', lhs, rhs);
 
-        toJSON: function () {
-            this.parameters = '[' + this.lhs.toJSON() + ', ' + this.rhs.toJSON() + ', ' + this.eps + ']';
-            return Assessor.Base.prototype.toJSON.call(this);
+            return Math.abs(lhs - rhs) <= this.eps;
         }
     });
 
     /**
-     * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is less
+     * Compares two {@link Value} objects and verifies only if the <tt>lhs</tt> value is less
      * than the <tt>rhs</tt> value.
-     * @param {Number|Assessor.Value.Value} lhs
-     * @param {Number|Assessor.Value.Value} rhs
-     * @augments Assessor.Verifier.Binary
+     * @param {Number|Value} lhs
+     * @param {Number|Value} rhs
+     * @augments Binary
      * @constructor
      */
-    Assessor.Verifier.Less = function (lhs, rhs) {
-        Assessor.Verifier.Binary.call(this, lhs, rhs);
-        this['class'] = 'Less';
+    Less = function Less(lhs, rhs) {
+        Binary.call(this, lhs, rhs);
     };
-    Assessor.Verifier.Less.prototype = new Assessor.Verifier.Binary();
 
-    Assessor.extend(Assessor.Verifier.Less.prototype, /** @lends Assessor.Verifier.Less.prototype */ {
+    obj.inherit(Binary, Less, /** @lends Less.prototype */ {
         verify: function (elements, fixtures) {
             var lhs = this.lhs.evaluate(elements, fixtures),
                 rhs = this.rhs.evaluate(elements, fixtures);
@@ -203,55 +182,47 @@
     });
 
     /**
-     * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is less
+     * Compares two {@link Value} objects and verifies only if the <tt>lhs</tt> value is less
      * than or equal to the <tt>rhs</tt> value.
-     * @param {Number|Assessor.Value.Value} lhs
-     * @param {Number|Assessor.Value.Value} rhs
-     * @param {Number} [eps=1e-5]
-     * @augments Assessor.Verifier.Binary
+     * @param {Number|Value} lhs
+     * @param {Number|Value} rhs
+     * @param {Number} [eps=CONF#eps]
+     * @augments Binary
      * @constructor
      */
-    Assessor.Verifier.LEQ = function (lhs, rhs, eps) {
-        Assessor.Verifier.Binary.call(this, lhs, rhs);
-        this['class'] = 'LEQ';
+    LEQ = function LEQ(lhs, rhs, eps) {
+        Binary.call(this, lhs, rhs);
 
         /**
-         * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
-         * and {@link Assessor.Verifier.Equals#rhs}.
+         * Allow a small difference when comparing {@link Equals#lhs}
+         * and {@link Equals#rhs}.
          * @type {Number}
          */
-        this.eps = eps || 1e-5;
+        this.eps = eps || CONF.eps;
     };
-    Assessor.Verifier.LEQ.prototype = new Assessor.Verifier.Binary();
 
-    Assessor.extend(Assessor.Verifier.LEQ.prototype, /** @lends Assessor.Verifier.LEQ.prototype */ {
+    obj.inherit(Binary, LEQ, /** @lends LEQ.prototype */ {
         verify: function (elements, fixtures) {
             var lhs = this.lhs.evaluate(elements, fixtures),
                 rhs = this.rhs.evaluate(elements, fixtures);
 
             return lhs - rhs <= this.eps;
-        },
-
-        toJSON: function () {
-            return Assessor.Verifier.Equals.prototype.toJSON.call(this);
         }
     });
 
     /**
-     * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is greater
+     * Compares two {@link Value} objects and verifies only if the <tt>lhs</tt> value is greater
      * than the <tt>rhs</tt> value.
-     * @param {Number|Assessor.Value.Value} lhs
-     * @param {Number|Assessor.Value.Value} rhs
-     * @augments Assessor.Verifier.Binary
+     * @param {Number|Value} lhs
+     * @param {Number|Value} rhs
+     * @augments Binary
      * @constructor
      */
-    Assessor.Verifier.Greater = function (lhs, rhs) {
-        Assessor.Verifier.Binary.call(this, lhs, rhs);
-        this['class'] = 'Greater';
+    Greater = function Greater(lhs, rhs) {
+        Binary.call(this, lhs, rhs);
     };
-    Assessor.Verifier.Greater.prototype = new Assessor.Verifier.Binary();
 
-    Assessor.extend(Assessor.Verifier.Greater.prototype, /** @lends Assessor.Verifier.Greater.prototype */ {
+    obj.inherit(Binary, Greater, /** @lends Greater.prototype */ {
         verify: function (elements, fixtures) {
             var lhs = this.lhs.evaluate(elements, fixtures),
                 rhs = this.rhs.evaluate(elements, fixtures);
@@ -261,60 +232,69 @@
     });
 
     /**
-     * Compares two {@link Assessor.Value.Value} objects and verifies only if the <tt>lhs</tt> value is greater
+     * Compares two {@link Value} objects and verifies only if the <tt>lhs</tt> value is greater
      * than or equal to the <tt>rhs</tt> value.
-     * @param {Number|Assessor.Value.Value} lhs
-     * @param {Number|Assessor.Value.Value} rhs
-     * @param {Number} [eps=1e-5]
-     * @augments Assessor.Verifier.Binary
+     * @param {Number|Value} lhs
+     * @param {Number|Value} rhs
+     * @param {Number} [eps=CONF#eps]
+     * @augments Binary
      * @constructor
      */
-    Assessor.Verifier.GEQ = function (lhs, rhs, eps) {
-        Assessor.Verifier.Binary.call(this, lhs, rhs);
-        this['class'] = 'GEQ';
-
+    GEQ = function GEQ(lhs, rhs, eps) {
         /**
-         * Allow a small difference when comparing {@link Assessor.Verifier.Equals#lhs}
-         * and {@link Assessor.Verifier.Equals#rhs}.
+         * Allow a small difference when comparing {@link Equals#lhs} and {@link Equals#rhs}.
          * @type {Number}
          */
-        this.eps = eps || 1e-5;
-    };
-    Assessor.Verifier.GEQ.prototype = new Assessor.Verifier.Binary();
+        Binary.call(this, lhs, rhs);
 
-    Assessor.extend(Assessor.Verifier.GEQ.prototype, /** @lends Assessor.Verifier.GEQ.prototype */ {
+        this.eps = eps || CONF.eps;
+    };
+
+    obj.inherit(Binary, GEQ, /** @lends GEQ.prototype */ {
         verify: function (elements, fixtures) {
             var lhs = this.lhs.evaluate(elements, fixtures),
                 rhs = this.rhs.evaluate(elements, fixtures);
 
             return lhs - rhs >= -this.eps;
-        },
-
-        toJSON: function () {
-            return Assessor.Verifier.Equals.prototype.toJSON.call(this);
         }
     });
 
-    Assessor.Verifier.Score = function (val) {
-        this['class'] = 'Score';
-
-        this.val = val;
+    /**
+     * Simply uses the given value to generate a score value.
+     * @param {Number|Value} val
+     * @augments Verifier
+     * @constructor
+     */
+    Score = function Score(val) {
+        /**
+         * The value that will form the score of this Verifier
+         * @type {Value}
+         */
+        this.val = Value.Value.expandNumber(val);
     };
-    Assessor.Verifier.Score.prototype = new Assessor.Verifier.Verifier();
 
-    Assessor.extend(Assessor.Verifier.Score.prototype, /** Assessor.Verifier.Score.prototype */ {
+    obj.inherit(Verifier.Verifier, Score, /** Score.prototype */ {
         choose: function (elements, fixtures) {
             return [];
         },
 
         verify: function (elements, fixtures) {
             this.score = [this.val.evaluate(elements, fixtures)];
-            return true;
-        },
 
-        toJSON: function () {
-            this.parameters = '[' + this.val.toJSON() + ']';
+            return true;
         }
     });
 
-}(this));
+    obj.extend(Verifier, {
+        Between: Between,
+        Binary: Binary,
+        Equals: Equals,
+        Less: Less,
+        LEQ: LEQ,
+        Greater: Greater,
+        GEQ: GEQ,
+        Score: Score
+    });
+
+    return Verifier;
+});

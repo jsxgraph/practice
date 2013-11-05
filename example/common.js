@@ -15,14 +15,16 @@
 JXG.extend(Assessor, {
     initsketch: function () {
         if (typeof GUI !== 'undefined') {
-            GUI.generator = JXG.deepCopy(GUI.generator, {
+            GUI.insertStrokes(GUI.nd_recognizer.Multistrokes); // initialize $N with the gestures
+
+            JXG.SketchReader.generator = JXG.deepCopy(JXG.SketchReader.generator, {
                 toFixed: 2,
                 freeLine: true,
                 useGlider: true,
                 useSymbols: false
             });
 
-            if (JXG.isAndroid() || JXG.isApple()) {
+            if (JXG.isTouchDevice()) {
                 GUI.down_event = 'touchstart';
                 GUI.up_event = 'touchend';
                 GUI.move_event = 'touchmove';
@@ -30,7 +32,7 @@ JXG.extend(Assessor, {
                 GUI.over_event = 'touchenter';
                 GUI.click_event = 'tap';
 
-                GUI.device = 'tablet';
+                JXG.Options.device = 'tablet';
             } else {
                 GUI.down_event = 'mousedown';
                 GUI.up_event = 'mouseup';
@@ -39,12 +41,15 @@ JXG.extend(Assessor, {
                 GUI.over_event = 'mouseover';
                 GUI.click_event = 'click';
 
-                GUI.device = 'pc';
+                JXG.Options.device = 'pc';
             }
 
-            GUI.finderEnabled = false;
-            GUI.constModeSwitch = false;
-            GUI.saveConstruction = function () {};
+            GUI.showBoardText = function () {};
+            GUI.activateBoardControls = function () {};
+            GUI.contextMenu = function () {};
+            GUI.Lang = {
+                std: {}
+            };
             GUI.contextMenu = function () {
                 return false;
             };
@@ -54,16 +59,28 @@ JXG.extend(Assessor, {
             GUI.id = function () {
                 return 'e' + (GUI.id_cnt++);
             };
+
+            GUI.Audio = {
+                play: function () {},
+                vibrate: function () {}
+            };
         }
+
+        JXG.Options.text.useMathJax = false;
+        JXG.Options.text.fontSize = 14;
+        JXG.Options.board.showCopyright = false;
+        JXG.Options.board.showNavigation = false;
     },
 
     init: function () {
         this.initsketch();
 
         GUI.board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox:[-8,8,8,-8], axis:false});
-        GUI.removeBoardHandlers();
-        GUI.switchMode('CD', false);
-        GUI.removeNavigationHandlers();
+        if (GUI) {
+            GUI.removeBoardHandlers();
+            GUI.addNavHandlers();
+            GUI.switchMode('CD', false);
+        }
     },
 
     log: function (i) {

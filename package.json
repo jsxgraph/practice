@@ -1,0 +1,45 @@
+{
+    "name": "practice",
+    "description": "Numerical assessment of JSXGraph constructions",
+    "homepage": "http://jsxgraph.org",
+    "version": "0.1.0",
+
+    "maintainers": [{
+        "name": "Michael Gerhaeuser",
+        "email": "michael.gerhaeuser@gmail.com"
+    }],
+
+    "bugs": {
+        "url": "http://github.com/jsxgraph/practice/issues"
+    },
+
+    "directories": {
+        "lib": "src"
+    },
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jsxgraph/practice.git"
+    },
+
+    "licenses": [{
+        "type": "MIT",
+        "url": "http://opensource.org/licenses/MIT"
+    }],
+
+    "dependencies": {
+    },
+    "optionalDependencies": {
+    },
+    "devDependencies": {
+        "uglify-js": "2.2.x"
+    },
+    "engines": {
+        "node": ">= 0.6.0"
+    },
+
+    "scripts": {
+    },
+
+    "private": true
+}

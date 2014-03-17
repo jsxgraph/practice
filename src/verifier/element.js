@@ -240,7 +240,7 @@
     };
     Assessor.Verifier.Polygon.prototype = new Assessor.Verifier.Verifier;
 
-    Assessor.extend(Assessor.Verifier.Polygon.prototype, {
+    Assessor.extend(Assessor.Verifier.Polygon.prototype, /** @lends Assessor.Verifier.Polygon.prototype */ {
         choose: function (elements, fixtures) {
             var i, j, p, fix, new_fixtures = [];
 
@@ -300,4 +300,63 @@
             return Assessor.Base.prototype.toJSON.call(this);
         }
     });
+
+
+    /**
+     * Verifies that the given element <tt>l</tt> is of type JXG.OBJECT_TYPE_TANGENT.
+     * @param {String} l
+     * @augments Assessor.Verifier.Verifier
+     * @constructor
+     */
+    Assessor.Verifier.Tangent = function (l) {
+        this['class'] = 'Tangent';
+
+        /**
+         * Store the identifier of the element.
+         * @type {String}
+         */
+        this.el = l;
+
+        return this;
+    };
+    Assessor.Verifier.Tangent.prototype = new Assessor.Verifier.Verifier();
+
+    Assessor.extend(Assessor.Verifier.Tangent.prototype, /** @lends Assessor.Verifier.Tangent.prototype */{
+        choose: function (elements, fixtures) {
+            var fix, i, j,
+                new_fixtures = [],
+                all = elements.lines;
+
+            // our element is already fixed, there's no point in continuing the search for fixtures
+            if (fixtures.get(this.el)) {
+                return [];
+            }
+
+            for (i = 0; i < all.length; i++) {
+                fix = new Assessor.FixtureList(fixtures);
+                fix.set(this.el, all[i]);
+
+                if (this.verify(elements, fix)) {
+                    new_fixtures.push(fix);
+                }
+            }
+
+            return new_fixtures;
+        },
+
+        verify: function (elements, fixtures) {
+            var p = fixtures.get(this.el),
+                res = p && (p.type === JXG.OBJECT_TYPE_TANGENT);
+
+            this.score = res ? 0 : 1;
+
+            return res;
+        },
+
+        toJSON: function () {
+            this.parameters = '["' + this.el + '"]';
+            return Assessor.Base.prototype.toJSON.call(this);
+        }
+    });
+
 }(this));
